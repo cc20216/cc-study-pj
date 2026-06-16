@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习总结</title>
+    <style>
+        /* 极简护眼风格 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #4a6fa5;
+            font-weight: 300;
+        }
+
+        /* 总结卡片 */
+        .summary-card {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .summary-item {
+            margin: 15px 0;
+        }
+
+        .summary-label {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .summary-value {
+            color: #2d3748;
+            font-size: 1.2rem;
+        }
+
+        /* 鼓励话语 */
+        .encouragement {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 30px 0;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        /* 自动跳转提示 */
+        .redirect-hint {
+            margin-top: 30px;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        /* 立即返回按钮 */
+        .back-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .summary-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 学习完成！</h1>
+        
+        <div class="summary-card">
+            <div class="summary-item">
+                <div class="summary-label">学习科目</div>
+                <div class="summary-value">{{ session.subject }}</div>
+            </div>
+            
+            <div class="summary-item">
+                <div class="summary-label">学习时长</div>
+                <div class="summary-value">{{ session.duration_minutes }} 分钟</div>
+            </div>
+            
+            <div class="summary-item">
+                <div class="summary-label">学习时间</div>
+                <div class="summary-value">{{ session.start_time|date:"Y年m月d日 H:i" }}</div>
+            </div>
+            
+            {% if session.notes %}
+            <div class="summary-item">
+                <div class="summary-label">学习总结</div>
+                <div class="summary-value">{{ session.notes }}</div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="encouragement">
+            {{ encouragement }}
+        </div>
+        
+        <div class="redirect-hint">
+            页面将在 <span id="countdown">5</span> 秒后自动返回首页...
+        </div>
+        
+        <a href="{% url 'home' %}" class="back-btn">立即返回首页</a>
+    </div>
+
+    <script>
+        // 自动跳转倒计时
+        let countdown = 5;
+        const countdownElement = document.getElementById('countdown');
+        
+        const timer = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = countdown;
+            
+            if (countdown <= 0) {
+                clearInterval(timer);
+                window.location.href = "{% url 'home' %}";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+{% if current_module.name == '概论' %}
+    <!-- 政治概论功能区 -->
+    <div style="margin-bottom: 20px;">
+        <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">政治概论学习功能</h4>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
+            <button id="ai-generate-btn" class="btn btn-primary">
+                <i data-lucide="sparkles" size="16"></i>
+                AI生成学习内容
+            </button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <select id="chapter-select" style="padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem;">
+                    <option value="all">全部章节</option>
+                    <option value="1">第一章：马克思主义中国化时代化的历史进程</option>
+                    <option value="2">第二章：毛泽东思想及其历史地位</option>
+                    <option value="3">第三章：邓小平理论</option>
+                    <option value="4">第四章：“三个代表”重要思想</option>
+                    <option value="5">第五章：科学发展观</option>
+                    <option value="6">第六章：习近平新时代中国特色社会主义思想的世界观和方法论</option>
+                    <option value="7">第七章：习近平新时代中国特色社会主义思想的核心要义</option>
+                    <option value="8">第八章：全面建设社会主义现代化国家</option>
+                    <option value="9">第九章：坚持和发展中国特色社会主义的总任务</option>
+                    <option value="10">第十章：中国特色社会主义经济建设</option>
+                </select>
+                <select id="detail-level" style="padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem;">
+                    <option value="brief">简略生成</option>
+                    <option value="detailed">详细生成</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI生成内容区域 -->
+    <div id="ai-content-area" style="margin-bottom: 20px; padding: 20px; background: #F7FAFC; border-radius: 12px;">
+        <h5 style="margin: 0 0 15px 0; color: var(--text-primary);">AI生成学习内容</h5>
+        <div id="ai-generated-content" style="color: var(--text-primary); min-height: 200px;">
+            <p style="color: var(--text-secondary);">点击"AI生成学习内容"按钮，选择章节和详细程度，生成定制化学习资料。</p>
+        </div>
+    </div>
+
+    <!-- 核心知识点 -->
+    <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">政治概论核心知识点</h4>
+    <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+        <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+            <li><strong>马克思主义中国化的科学内涵</strong> - 马克思主义基本原理同中国具体实际相结合、同中华优秀传统文化相结合</li>
+            <li><strong>毛泽东思想的活的灵魂</strong> - 实事求是、群众路线、独立自主</li>
+            <li><strong>邓小平理论的首要的基本的理论问题</strong> - 什么是社会主义、怎样建设社会主义</li>
+            <li><strong>“三个代表”重要思想的核心观点</strong> - 中国共产党始终代表中国先进生产力的发展要求，代表中国先进文化的前进方向，代表中国最广大人民的根本利益</li>
+            <li><strong>科学发展观的第一要义</strong> - 发展</li>
+            <li><strong>习近平新时代中国特色社会主义思想的核心要义</strong> - 坚持和发展中国特色社会主义</li>
+            <li><strong>新时代的主要矛盾</strong> - 人民日益增长的美好生活需要和不平衡不充分的发展之间的矛盾</li>
+            <li><strong>“两个一百年”奋斗目标</strong> - 到建党一百年时全面建成小康社会，到新中国成立一百年时全面建成社会主义现代化强国</li>
+            <li><strong>“五位一体”总体布局</strong> - 经济建设、政治建设、文化建设、社会建设、生态文明建设</li>
+            <li><strong>“四个全面”战略布局</strong> - 全面建设社会主义现代化国家、全面深化改革、全面依法治国、全面从严治党</li>
+        </ul>
+    </div>
+    <p style="margin: 15px 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+        以上为政治概论核心知识点，建议结合AI生成的定制化内容进行深入学习。
+    </p>
+{% elif current_module.name == '毛泽东思想' %}
+    <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">毛泽东思想学习</h4>
+    <p style="margin: 0 0 15px; color: var(--text-primary);">
+        毛泽东思想是马克思列宁主义在中国的创造性运用和发展，是被实践证明了的关于中国革命和建设的正确的理论原则和经验总结。
+    </p>
+    <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">核心内容：</h5>
+    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+        <li>新民主主义革命理论</li>
+        <li>社会主义革命和社会主义建设理论</li>
+        <li>革命军队建设和军事战略的理论</li>
+        <li>政策和策略的理论</li>
+        <li>思想政治工作和文化工作的理论</li>
+        <li>党的建设理论</li>
+    </ul>
+    <div style="margin-top: 20px;">
+        <button id="ai-generate-mao-btn" class="btn btn-primary">
+            <i data-lucide="sparkles" size="16"></i>
+            AI生成毛泽东思想学习资料
+        </button>
+    </div>
+{% elif current_module.name == '邓小平理论' %}
+    <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">邓小平理论学习</h4>
+    <p style="margin: 0 0 15px; color: var(--text-primary);">
+        邓小平理论是马克思列宁主义的基本原理同当代中国实践和时代特征相结合的产物，是毛泽东思想在新的历史条件下的继承和发展。
+    </p>
+    <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">核心内容：</h5>
+    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+        <li>社会主义初级阶段理论</li>
+        <li>社会主义本质理论</li>
+        <li>改革开放理论</li>
+        <li>社会主义市场经济理论</li>
+        <li>社会主义现代化发展战略</li>
+        <li>社会主义民主政治建设</li>
+        <li>社会主义精神文明建设</li>
+    </ul>
+    <div style="margin-top: 20px;">
+        <button id="ai-generate-deng-btn" class="btn btn-primary">
+            <i data-lucide="sparkles" size="16"></i>
+            AI生成邓小平理论学习资料
+        </button>
+    </div>
+{% else %}
+    <p style="color: var(--text-secondary);">
+        该模块的推荐学习内容正在整理中，敬请期待...
+    </p>
+{% endif %}

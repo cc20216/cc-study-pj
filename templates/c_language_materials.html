@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专升本C语言学习资料 - StudyFlow</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 复用首页样式 */
+        :root {
+            --bg-main: #F8FAFB;
+            --card-bg: #FFFFFF;
+            --mint: #81C784;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --border: #EDF2F7;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, "Noto Sans SC", sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        nav {
+            height: 64px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            padding: 24px 40px;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            height: fit-content;
+            position: sticky;
+            top: 24px;
+        }
+
+        .main-content {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            min-height: calc(100vh - 112px);
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--mint);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #66BB6A;
+        }
+
+        .btn-secondary {
+            background: #E2E8F0;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #CBD5E0;
+        }
+
+        /* 模块列表 */
+        .module-list {
+            margin-top: 20px;
+        }
+
+        .module-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .module-item:hover {
+            background: #F7FAFC;
+        }
+
+        .module-item.active {
+            background: rgba(129, 199, 132, 0.1);
+            border-left: 4px solid var(--mint);
+            font-weight: 500;
+        }
+
+        .module-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* 学习内容 */
+        .study-content {
+            margin-top: 20px;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .module-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .study-section {
+            background: #F7FAFC;
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        /* 资料卡片 */
+        .material-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 16px;
+        }
+
+        .material-title {
+            font-weight: 500;
+            margin: 0 0 8px 0;
+            color: var(--text-primary);
+        }
+
+        .material-description {
+            margin: 0 0 12px 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .material-meta {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 250px 1fr;
+                gap: 20px;
+                padding: 20px 30px;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            nav {
+                padding: 0 20px;
+            }
+            
+            /* 侧边栏 */
+            .sidebar {
+                position: static;
+                order: 2;
+            }
+            
+            /* 主内容 */
+            .main-content {
+                order: 1;
+            }
+            
+            /* 学习模块列表 */
+            .module-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 8px;
+            }
+            
+            .module-item {
+                margin-bottom: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+                gap: 16px;
+            }
+            
+            nav {
+                padding: 0 16px;
+            }
+            
+            /* 模块标题 */
+            .module-title {
+                font-size: 1.3rem !important;
+            }
+            
+            /* 学习部分 */
+            .study-section {
+                padding: 20px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'home' %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 10px; font-weight: bold; color: var(--mint); font-size: 1.2rem;">
+                <i data-lucide="leaf"></i> StudyFlow
+            </div>
+        </a>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: var(--text-primary);">首页</a>
+            <a href="{% url 'template_management' %}" class="btn btn-secondary">
+                <i data-lucide="clipboard-list" size="16"></i>
+                模板管理
+            </a>
+            <a href="{% url 'logout' %}" style="background: #E2E8F0; padding: 8px 16px; border-radius: 8px; text-decoration: none; color: var(--text-primary); font-size: 0.9rem;">退出登录</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 左侧模块列表 -->
+        <div class="sidebar">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="code" size="20" style="color: var(--mint);"></i>
+                <h2>专升本C语言学习模块</h2>
+            </div>
+            <div class="module-list">
+                {% for module in modules %}
+                    <a href="/c_language/materials/{{ module.name }}/" class="module-item {% if current_module.name == module.name %}active{% endif %}">
+                        <div class="module-color" style="background-color: {{ module.color_code }};"></div>
+                        <span>{{ module.name }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 右侧学习内容 -->
+        <div class="main-content">
+            <div class="module-header">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="module-color" style="background-color: {{ current_module.color_code }}; width: 24px; height: 24px;"></div>
+                    <h1 class="module-title">{{ current_module.name }}学习资料</h1>
+                </div>
+            </div>
+
+            <div class="study-content">
+                <!-- 学习资料区域 -->
+                <div class="study-section">
+                    <h3 class="section-title">推荐学习资料</h3>
+                    <p>以下是专升本C语言 {{ current_module.name }}模块的推荐学习资料：</p>
+                </div>
+
+                <!-- 资料列表 -->
+                <div class="study-section">
+                    <h3 class="section-title">资料列表</h3>
+                    
+                    {% if current_module.name == '语法' %}
+                        <!-- 语法资料 -->
+                        <div class="material-card">
+                            <h4 class="material-title">C语言基础语法教程</h4>
+                            <p class="material-description">详细介绍C语言的基本语法，包括变量、数据类型、运算符、控制结构等内容。</p>
+                            <div class="material-meta">
+                                <span>适合人群：初学者</span> | 
+                                <span>预计学习时间：5小时</span>
+                            </div>
+                        </div>
+                        
+                        <div class="material-card">
+                            <h4 class="material-title">C语言指针详解</h4>
+                            <p class="material-description">深入讲解C语言指针的概念、用法和常见问题，帮助学习者掌握指针这一难点。</p>
+                            <div class="material-meta">
+                                <span>适合人群：有一定基础</span> | 
+                                <span>预计学习时间：3小时</span>
+                            </div>
+                        </div>
+                        
+                        <div class="material-card">
+                            <h4 class="material-title">C语言结构体与共用体</h4>
+                            <p class="material-description">讲解C语言中结构体和共用体的定义、使用和内存布局，以及如何在实际项目中应用。</p>
+                            <div class="material-meta">
+                                <span>适合人群：有一定基础</span> | 
+                                <span>预计学习时间：2小时</span>
+                            </div>
+                        </div>
+                    {% elif current_module.name == '编程题' %}
+                        <!-- 编程题资料 -->
+                        <div class="material-card">
+                            <h4 class="material-title">C语言编程题集</h4>
+                            <p class="material-description">包含100道经典C语言编程题，涵盖基础、中级和高级难度，每道题都有详细解析。</p>
+                            <div class="material-meta">
+                                <span>适合人群：所有学习者</span> | 
+                                <span>题量：100道</span>
+                            </div>
+                        </div>
+                        
+                        <div class="material-card">
+                            <h4 class="material-title">专升本C语言历年真题</h4>
+                            <p class="material-description">收集整理了近5年专升本C语言考试的真题，包含答案和解析，帮助学习者了解考试题型和难度。</p>
+                            <div class="material-meta">
+                                <span>适合人群：备考学生</span> | 
+                                <span>年份：近5年</span>
+                            </div>
+                        </div>
+                        
+                        <div class="material-card">
+                            <h4 class="material-title">C语言算法入门</h4>
+                            <p class="material-description">介绍C语言中常见的算法和数据结构，包括排序、查找、链表、栈、队列等，每章都有示例代码。</p>
+                            <div class="material-meta">
+                                <span>适合人群：有一定基础</span> | 
+                                <span>预计学习时间：10小时</span>
+                            </div>
+                        </div>
+                    {% elif current_module.name == '知识点' %}
+                        <!-- 知识点资料 -->
+                        <div class="material-card">
+                            <h4 class="material-title">C语言核心知识点总结</h4>
+                            <p class="material-description">整理了C语言中需要掌握的核心知识点，包括语法、函数、数组、指针、结构体等，适合复习和查漏补缺。</p>
+                            <div class="material-meta">
+                                <span>适合人群：所有学习者</span> | 
+                                <span>页数：50页</span>
+                            </div>
+                        </div>
+                        
+                        <div class="material-card">
+                            <h4 class="material-title">C语言常见错误及解决方法</h4>
+                            <p class="material-description">总结了C语言编程中常见的错误类型和解决方法，帮助学习者避免和调试错误。</p>
+                            <div class="material-meta">
+                                <span>适合人群：所有学习者</span> | 
+                                <span>错误类型：50+</span>
+                            </div>
+                        </div>
+                    {% elif current_module.name == '模拟题' %}
+                        <!-- 模拟题资料 -->
+                        <div class="material-card">
+                            <h4 class="material-title">专升本C语言模拟试卷（10套）</h4>
+                            <p class="material-description">包含10套专升本C语言模拟试卷，严格按照考试大纲编写，适合考前模拟练习。</p>
+                            <div class="material-meta">
+                                <span>适合人群：备考学生</span> | 
+                                <span>套数：10套</span>
+                            </div>
+                        </div>
+                        
+                        <div class="material-card">
+                            <h4 class="material-title">C语言模拟题解析视频</h4>
+                            <p class="material-description">对模拟题进行详细解析，讲解解题思路和技巧，帮助学习者提高解题能力。</p>
+                            <div class="material-meta">
+                                <span>适合人群：备考学生</span> | 
+                                <span>时长：5小时</span>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p style="color: var(--text-secondary);">
+                            该模块的学习资料正在整理中，敬请期待...
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- 学习工具 -->
+                <div class="study-section">
+                    <h3 class="section-title">学习工具</h3>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <a href="/c_language/study/{{ current_module.name }}/" class="btn btn-primary">
+                            <i data-lucide="code" size="16"></i>
+                            返回学习页面
+                        </a>
+                        <a href="{% url 'study_session' %}" class="btn btn-secondary">
+                            <i data-lucide="clock" size="16"></i>
+                            开始计时学习
+                        </a>
+                        <a href="{% url 'daily_progress' %}" class="btn btn-secondary">
+                            <i data-lucide="pencil" size="16"></i>
+                            记录学习进度
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

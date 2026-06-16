@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - StudyFlow</title>
+    <script src="https://unpkg.com/lucide@0.284.0/dist/umd/lucide.min.js"></script>
+    <style>
+        /* 复用登录页面样式 */
+        :root {
+            --bg-main: #F8FAFB;
+            --card-bg: #FFFFFF;
+            --mint: #81C784;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --border: #EDF2F7;
+        }
+
+        /* 暗夜模式变量 */
+        :root.dark {
+            --bg-main: #1A202C;
+            --card-bg: #2D3748;
+            --mint: #81C784;
+            --text-primary: #F7FAFC;
+            --text-secondary: #A0AEC0;
+            --border: #4A5568;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, "Noto Sans SC", sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 顶部导航栏 */
+        nav {
+            height: 64px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 40px;
+            border-bottom: 1px solid var(--border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            color: var(--mint);
+            font-size: 1.2rem;
+            text-decoration: none;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            padding: 24px;
+            width: 100%;
+            margin-top: 64px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 60px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            margin: 0 0 40px 0;
+            font-weight: 500;
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            background: var(--bg-main);
+            color: var(--text-primary);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--mint);
+            box-shadow: 0 0 0 2px rgba(129, 199, 132, 0.2);
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--mint);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #66BB6A;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(129, 199, 132, 0.3);
+        }
+
+        /* 链接样式 */
+        .link {
+            color: var(--mint);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        /* 底部链接 */
+        .bottom-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 1rem;
+        }
+
+        /* 错误信息 */
+        .error-message {
+            background: #FFF5F5;
+            color: #E53E3E;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border: 1px solid #FED7D7;
+        }
+
+        /* 成功信息 */
+        .success-message {
+            background: #F0FFF4;
+            color: #22543D;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border: 1px solid #C6F6D5;
+        }
+
+        /* 暗夜模式适配 */
+        :root.dark .error-message {
+            background: #742A2A;
+            color: #FC8181;
+            border-color: #993333;
+        }
+
+        :root.dark .success-message {
+            background: #22543D;
+            color: #81E6D9;
+            border-color: #2D6A4F;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .card {
+                padding: 40px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏，包含首页标签元素 -->
+    <nav>
+        <a href="{% url 'home' %}" class="logo">
+            <i data-lucide="leaf"></i> StudyFlow
+        </a>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h1>注册 StudyFlow</h1>
+            
+            <!-- 错误信息 -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="{% if message.tags == 'error' %}error-message{% elif message.tags == 'success' %}success-message{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="POST" action="{% url 'register' %}">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" required autofocus placeholder="请输入用户名">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">邮箱</label>
+                    <input type="email" id="email" name="email" required placeholder="请输入邮箱">
+                </div>
+
+                <div class="form-group">
+                    <label for="password1">密码</label>
+                    <input type="password" id="password1" name="password1" required placeholder="请输入密码（至少8位）">
+                </div>
+
+                <div class="form-group">
+                    <label for="password2">确认密码</label>
+                    <input type="password" id="password2" name="password2" required placeholder="请再次输入密码">
+                </div>
+
+                <button type="submit" class="btn btn-primary">注册</button>
+
+                <div class="bottom-link">
+                    已有账号？ <a href="{% url 'login' %}" class="link">立即登录</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        // 暗夜模式初始化
+        const root = document.documentElement;
+        
+        // 检查本地存储或系统偏好
+        const isDarkMode = localStorage.getItem('darkMode') === 'true' || 
+                         (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && 
+                          localStorage.getItem('darkMode') === null);
+        
+        // 设置初始模式
+        if (isDarkMode) {
+            root.classList.add('dark');
+        }
+    </script>
+</body>
+</html>

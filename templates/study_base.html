@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ template_name }}学习 - StudyFlow</title>
+    <script src="https://unpkg.com/lucide@0.284.0/dist/umd/lucide.min.js"></script>
+    <style>
+        /* 复用首页样式 */
+        :root {
+            --bg-main: #F8FAFB;
+            --card-bg: #FFFFFF;
+            --mint: #81C784;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --border: #EDF2F7;
+        }
+
+        /* 暗夜模式变量 */
+        :root.dark {
+            --bg-main: #1A202C;
+            --card-bg: #2D3748;
+            --mint: #81C784;
+            --text-primary: #F7FAFC;
+            --text-secondary: #A0AEC0;
+            --border: #4A5568;
+        }
+
+        /* 确保按钮颜色在暗夜模式下依然清晰可见 */
+        :root.dark .btn-primary {
+            background: var(--mint);
+            color: white;
+        }
+
+        :root.dark .btn-secondary {
+            background: #4A5568;
+            color: var(--text-primary);
+        }
+
+        :root.dark .btn-purple {
+            background: #6366f1;
+            color: white;
+        }
+
+        /* 确保卡片和边框在暗夜模式下清晰可见 */
+        :root.dark .sidebar,
+        :root.dark .main-content {
+            background: var(--card-bg);
+            border-color: var(--border);
+        }
+
+        /* 确保文字颜色在暗夜模式下清晰可见 */
+        :root.dark h1,
+        :root.dark h2,
+        :root.dark h3,
+        :root.dark h4,
+        :root.dark h5,
+        :root.dark p,
+        :root.dark span,
+        :root.dark div,
+        :root.dark select,
+        :root.dark option {
+            color: var(--text-primary);
+        }
+
+        /* 确保侧边栏模块文字颜色在暗夜模式下清晰可见 */
+        :root.dark .module-item {
+            color: var(--text-primary);
+        }
+
+        /* 确保模块目标标签在暗夜模式下清晰可见 */
+        :root.dark .module-target {
+            background: var(--card-bg) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* 确保学习区域在暗夜模式下清晰可见 */
+        :root.dark .study-section {
+            background: var(--card-bg) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* 确保学习区域内的白色背景div在暗夜模式下清晰可见 */
+        :root.dark .study-section div[style*="background: white"],
+        :root.dark .study-section div[style*="background-color: white"],
+        :root.dark .study-section div[style*="background: #F7FAFC"] {
+            background-color: var(--card-bg) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        /* 确保链接颜色在暗夜模式下清晰可见 */
+        :root.dark a {
+            color: var(--mint);
+        }
+
+        /* 确保表单元素在暗夜模式下清晰可见 */
+        :root.dark input,
+        :root.dark textarea,
+        :root.dark select {
+            background: #4A5568;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        /* 确保进度条在暗夜模式下清晰可见 */
+        :root.dark .pg-track {
+            background: #4A5568;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, "Noto Sans SC", sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        nav {
+            height: 64px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            padding: 24px 40px;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            height: fit-content;
+            position: sticky;
+            top: 24px;
+        }
+
+        .main-content {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            min-height: calc(100vh - 112px);
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--mint);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #66BB6A;
+        }
+
+        .btn-secondary {
+            background: #E2E8F0;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #CBD5E0;
+        }
+
+        /* 紫色按钮 - 用于AI相关功能 */
+        .btn.btn-purple {
+            background: #6366f1 !important;
+            color: white !important;
+        }
+
+        .btn.btn-purple:hover {
+            background: #4f46e5 !important;
+        }
+
+        /* 模块列表 */
+        .module-list {
+            margin-top: 20px;
+        }
+
+        .module-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .module-item:hover {
+            background: #F7FAFC;
+        }
+
+        .module-item.active {
+            background: rgba(129, 199, 132, 0.1);
+            border-left: 4px solid var(--mint);
+            font-weight: 500;
+        }
+
+        .module-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* 学习内容 */
+        .study-content {
+            margin-top: 20px;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .module-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .module-target {
+            background: #F7FAFC;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .study-section {
+            background: #F7FAFC;
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        /* 悬浮按钮样式 */
+        .floating-buttons {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 999;
+        }
+        
+        .floating-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: var(--mint);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+        
+        .floating-btn:hover {
+            background: #66BB6A;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .floating-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 悬浮按钮图标样式 */
+        .floating-btn i {
+            width: 24px;
+            height: 24px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 250px 1fr;
+                gap: 20px;
+                padding: 20px 30px;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            nav {
+                padding: 0 20px;
+            }
+            
+            /* 侧边栏 */
+            .sidebar {
+                position: static;
+                order: 2;
+            }
+            
+            /* 主内容 */
+            .main-content {
+                order: 1;
+            }
+            
+            /* 学习模块列表 */
+            .module-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 8px;
+            }
+            
+            .module-item {
+                margin-bottom: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+                gap: 16px;
+            }
+            
+            nav {
+                padding: 0 16px;
+            }
+            
+            /* 模块标题 */
+            .module-title {
+                font-size: 1.3rem !important;
+            }
+            
+            /* 学习部分 */
+            .study-section {
+                padding: 20px !important;
+            }
+            
+            /* 进度卡片 */
+            .study-section:nth-child(2) div {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+            
+            /* 按钮组 */
+            .study-section:nth-child(3) div {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+            
+            /* 悬浮按钮响应式调整 */
+            .floating-buttons {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .floating-btn {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .floating-btn i {
+                width: 20px;
+                height: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* 按钮 */
+            .btn {
+                padding: 10px 16px !important;
+                font-size: 0.85rem !important;
+            }
+            
+            /* 模块列表 */
+            .module-list {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+                <div style="display: flex; align-items: center; gap: 10px; font-weight: bold; color: var(--mint); font-size: 1.2rem;">
+                    <i data-lucide="leaf"></i> StudyFlow
+                </div>
+            </a>
+            <button id="dark-mode-toggle" style="background: transparent; border: none; cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; color: var(--text-primary);">
+                <i data-lucide="moon" size="20"></i>
+            </button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: var(--text-primary);">首页</a>
+            <a href="{% url 'template_management' %}" class="btn btn-secondary">
+                <i data-lucide="clipboard-list" size="16"></i>
+                模板管理
+            </a>
+            <a href="{% url 'logout' %}" style="background: #E2E8F0; padding: 8px 16px; border-radius: 8px; text-decoration: none; color: var(--text-primary); font-size: 0.9rem;">退出登录</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 左侧模块列表 -->
+        <div class="sidebar">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="book-open" size="20" style="color: var(--mint);"></i>
+                <h2>{{ template_name }}学习模块</h2>
+            </div>
+            <div class="module-list">
+                {% if modules %}
+                    {% for module in modules %}
+                        <div class="module-item {% if current_module.name == module.name %}active{% endif %}" 
+                             data-module-url="{% url 'study_base' template_id=template_id module_name=module.name %}">
+                            <div class="module-color" style="background-color: {{ module.color_code }};"></div>
+                            <span>{{ module.name }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 16px;">
+                        暂无学习模块，请先创建模块
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 右侧学习内容 -->
+        <div class="main-content">
+            {% if current_module %}
+                <div class="module-header">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="module-color" style="background-color: {{ current_module.color_code }}; width: 24px; height: 24px;"></div>
+                        <h1 class="module-title">{{ current_module.name }}</h1>
+                    </div>
+                    {% if current_module.target_value %}
+                        <div class="module-target">
+                            今日目标: {{ current_module.target_value }}个/分钟
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="study-content">
+                    <!-- 学习内容区域 -->
+                    <div class="study-section">
+                        <h3 class="section-title">学习内容</h3>
+                        <p>欢迎来到{{ template_name }} {{ current_module.name }}模块学习！</p>
+                        <p style="color: var(--text-secondary); margin-top: 10px;">
+                            这里将展示该模块的详细学习内容，包括练习、资料和进度追踪功能。
+                        </p>
+                    </div>
+
+                    <!-- 学习进度 -->
+                    <div class="study-section">
+                        <h3 class="section-title">学习进度</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">今日完成</div>
+                                <div style="font-size: 2rem; font-weight: bold; color: var(--mint);">{{ study_progress.today_completed|default:0 }}</div>
+                                {% if current_module.target_value %}
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">/ {{ current_module.target_value }}</div>
+                                {% endif %}
+                            </div>
+                            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">累计完成</div>
+                                <div style="font-size: 2rem; font-weight: bold; color: var(--mint);">{{ study_progress.total_completed|default:0 }}</div>
+                            </div>
+                            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">完成率</div>
+                                <div style="font-size: 2rem; font-weight: bold; color: var(--mint);">{{ study_progress.completion_rate|default:0 }}%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 推荐学习模块 -->
+                    <div class="study-section">
+                        <h3 class="section-title">推荐学习</h3>
+                        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            {% if learning_materials %}
+                                <!-- 显示AI生成的学习资料 -->
+                                <div style="margin-bottom: 20px;">
+                                    <h4 style="margin: 0 0 15px 0; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="brain" size="18" style="color: var(--mint);"></i>
+                                        AI生成学习资料
+                                    </h4>
+                                    
+                                    {% for material in learning_materials %}
+                                        <div style="background: #F7FAFC; padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                                <h5 style="margin: 0; color: var(--text-primary); font-size: 1rem;">
+                                                    {{ material.get_generate_type_display }} - {{ material.section_name }}
+                                                </h5>
+                                                <span style="font-size: 0.8rem; color: var(--text-secondary);">
+                                                    {{ material.generated_at }}
+                                                </span>
+                                            </div>
+                                            
+                                            <!-- 学习资料内容 - 支持折叠/展开 -->
+                                            <div class="material-content-container">
+                                                <!-- 内容容器 -->
+                                                <div class="material-content" style="white-space: pre-wrap; line-height: 1.6; color: var(--text-primary); max-height: 400px; overflow: hidden;">
+                                                    {{ material.content }}
+                                                </div>
+                                                
+                                                <!-- 渐变遮罩 -->
+                                                <div class="material-gradient" style="position: relative; margin-top: -50px; height: 50px; background: linear-gradient(to bottom, transparent, #F7FAFC); display: block;"></div>
+                                                
+                                                <!-- 折叠/展开按钮 -->
+                                                <button class="material-toggle-btn" style="background: var(--mint); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 0.95rem; cursor: pointer; margin-top: 16px; display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center;">
+                                                    <i data-lucide="chevron-down" size="16"></i>
+                                                    <span>展开查看全部</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% elif current_module.name == '词汇' %}
+                                <!-- 词汇功能区 -->
+                                <div style="margin-bottom: 20px;">
+                                    <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">词汇学习功能</h4>
+                                    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
+                                        <button id="random-check-btn" class="btn btn-primary">
+                                            <i data-lucide="shuffle" size="16"></i>
+                                            随机抽查
+                                        </button>
+                                        <div style="display: flex; gap: 8px; align-items: center;">
+                                            <input type="text" id="word-search" placeholder="搜索单词..." 
+                                                   style="padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; flex: 1; min-width: 200px;">
+                                            <button id="search-btn" class="btn btn-secondary">
+                                                <i data-lucide="search" size="16"></i>
+                                                搜索
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% elif current_module.name == '语法' %}
+                                <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">语法学习</h4>
+                                <p style="margin: 0 0 15px; color: var(--text-primary);">
+                                    语法是学习的基础，建议每天练习相关题目，熟悉各种时态和句型的用法。
+                                </p>
+                            {% elif current_module.name == '听力' %}
+                                <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">听力技巧</h4>
+                                <p style="margin: 0 0 15px; color: var(--text-primary);">
+                                    听力是考试中的重要部分，建议每天坚持听30分钟英语材料，提高听力水平。
+                                </p>
+                            {% elif current_module.name == '阅读' %}
+                                <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">阅读技巧</h4>
+                                <p style="margin: 0 0 15px; color: var(--text-primary);">
+                                    阅读考试包括各种题型，建议提高阅读速度，掌握快速定位关键信息的方法。
+                                </p>
+                            {% elif current_module.name == '写作' %}
+                                <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">写作模板</h4>
+                                <p style="margin: 0 0 15px; color: var(--text-primary);">
+                                    写作考试要求考生根据提示写出一篇短文，建议积累常用词汇和句型，提高写作水平。
+                                </p>
+                            {% elif current_module.name == '翻译' %}
+                                <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">翻译技巧</h4>
+                                <p style="margin: 0 0 15px; color: var(--text-primary);">
+                                    翻译考试要求考生将中文翻译成英文，建议积累常用词汇和短语，掌握各种句型的翻译方法。
+                                </p>
+                            {% else %}
+                                <p style="color: var(--text-secondary);">
+                                    该模块的推荐学习内容正在整理中，敬请期待...
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- 学习工具 -->
+                    <div class="study-section">
+                        <h3 class="section-title">学习工具</h3>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <a href="{% url 'study_session' %}?template_id={{ template.id }}" id="study-session-link" class="btn btn-primary">
+                                <i data-lucide="clock" size="16"></i>
+                                开始计时学习
+                            </a>
+                            <a href="{% url 'daily_progress' %}?template_id={{ template.id }}" id="daily-progress-link" class="btn btn-secondary">
+                                <i data-lucide="pencil" size="16"></i>
+                                记录学习进度
+                            </a>
+                            <a href="{% url 'template_management' %}?template_id={{ template.id }}" id="template-management-link" class="btn btn-secondary">
+                                <i data-lucide="settings" size="16"></i>
+                                管理模板
+                            </a>
+                            <a href="{% url 'progress_dashboard' %}?template_id={{ template.id }}" id="progress-dashboard-link" class="btn btn-secondary">
+                                <i data-lucide="bar-chart-2" size="16"></i>
+                                查看学习统计
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- AI生成学习资料功能 -->
+                    <div class="form-container" style="margin-bottom: 20px; background: #F0FFF4; border-radius: 16px; padding: 24px; border: 1px solid var(--border);">
+                        <h3 style="margin-bottom: 16px; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="brain" size="16" style="color: var(--mint);"></i>
+                            AI生成学习资料
+                        </h3>
+                        <form id="generate-materials-form" onsubmit="generateMaterials(event, {{ template.id }})">
+                            {% csrf_token %}
+                            <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">选择要生成资料的模块：</label>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
+                            {% for module in modules %}
+                                <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: white; border-radius: 8px; border: 1px solid var(--border); cursor: pointer;">
+                                    <input type="checkbox" name="modules" value="{{ module.id }}" style="width: 16px; height: 16px; accent-color: var(--mint);">
+                                    <span>{{ module.name }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- 生成版本选择 -->
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">生成版本：</label>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: white; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.3s ease;">
+                                <input type="radio" name="generate_version" value="detailed" checked style="width: 16px; height: 16px; accent-color: var(--mint);">
+                                <span>详细版（知识点+考题+练习题+总结）</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: white; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.3s ease;">
+                                <input type="radio" name="generate_version" value="normal" style="width: 16px; height: 16px; accent-color: var(--mint);">
+                                <span>普通版（知识点+考题+总结）</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: white; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.3s ease;">
+                                <input type="radio" name="generate_version" value="simple" style="width: 16px; height: 16px; accent-color: var(--mint);">
+                                <span>简略版（考题+练习题）</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- 内容自定义选择 -->
+                    <div id="content-customization" class="form-group" style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">内容自定义（可取消不需要的内容）：</label>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 16px; background: #F7FAFC; border-radius: 8px;">
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" name="content_types" value="knowledge" checked style="width: 16px; height: 16px; accent-color: var(--mint);">
+                                <span>知识点讲解</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" name="content_types" value="questions" checked style="width: 16px; height: 16px; accent-color: var(--mint);">
+                                <span>考题</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" name="content_types" value="exercises" checked style="width: 16px; height: 16px; accent-color: var(--mint);">
+                                <span>练习题</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" name="content_types" value="summary" checked style="width: 16px; height: 16px; accent-color: var(--mint);">
+                                <span>总结</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px;">
+                        <button type="submit" class="btn btn-purple" style="padding: 12px; flex: 1;">
+                            <i data-lucide="send" size="16"></i>
+                            生成学习资料
+                        </button>
+                    </div>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; text-align: center;">
+                    <i data-lucide="book-open" size="60" style="color: var(--mint); opacity: 0.5; margin-bottom: 20px;"></i>
+                    <h2 style="color: var(--text-primary); margin-bottom: 16px;">欢迎来到{{ template_name }}学习</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 24px; max-width: 400px;">
+                        暂无学习模块，请先创建模块，开始您的学习之旅
+                    </p>
+                    <a href="{% url 'template_management' %}" class="btn btn-primary">
+                        <i data-lucide="plus" size="16"></i>
+                        创建学习模块
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 悬浮按钮 -->
+    <div class="floating-buttons">
+        <!-- 返回首页按钮 -->
+        <button class="floating-btn" id="home-btn" title="返回首页" onclick="window.location.href='{% url 'home' %}'">
+            <i data-lucide="home"></i>
+        </button>
+        <!-- 回到顶部按钮 -->
+        <button class="floating-btn" id="to-top-btn" title="回到顶部">
+            <i data-lucide="arrow-up"></i>
+        </button>
+        <!-- 回到底部按钮 -->
+        <button class="floating-btn" id="to-bottom-btn" title="回到底部">
+            <i data-lucide="arrow-down"></i>
+        </button>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // 悬浮按钮功能
+        document.addEventListener('DOMContentLoaded', () => {
+            // 回到顶部按钮
+            const toTopBtn = document.getElementById('to-top-btn');
+            toTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // 回到底部按钮
+            const toBottomBtn = document.getElementById('to-bottom-btn');
+            toBottomBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: 'smooth'
+                });
+            });
+
+            // 暗夜模式初始化
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const root = document.documentElement;
+            
+            // 检查本地存储或系统偏好
+            const isDarkMode = localStorage.getItem('darkMode') === 'true' || 
+                             (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && 
+                              localStorage.getItem('darkMode') === null);
+            
+            // 设置初始模式
+            if (isDarkMode) {
+                root.classList.add('dark');
+            }
+            
+            // 切换按钮点击事件
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', function() {
+                    root.classList.toggle('dark');
+                    
+                    // 保存设置到本地存储
+                    const isDark = root.classList.contains('dark');
+                    localStorage.setItem('darkMode', isDark);
+                    
+                    // 更新图标
+                    updateDarkModeIcon();
+                });
+                
+                // 更新图标函数
+                function updateDarkModeIcon() {
+                    const icon = darkModeToggle.querySelector('i');
+                    if (icon) {
+                        if (root.classList.contains('dark')) {
+                            icon.dataset.lucide = 'moon';
+                        } else {
+                            icon.dataset.lucide = 'sun';
+                        }
+                        // 重新渲染图标
+                        lucide.createIcons();
+                    }
+                }
+                
+                // 初始更新图标
+                updateDarkModeIcon();
+            }
+
+            // 学习模块点击和双击处理
+            const moduleItems = document.querySelectorAll('.module-item');
+            let clickTimer = null;
+
+            moduleItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // 清除之前的定时器
+                    if (clickTimer) {
+                        clearTimeout(clickTimer);
+                    }
+                    
+                    // 设置单击定时器
+                    clickTimer = setTimeout(() => {
+                        const url = item.getAttribute('data-module-url');
+                        window.location.href = url;
+                    }, 200); // 200ms延迟判断是单击还是双击
+                });
+
+                item.addEventListener('dblclick', () => {
+                    // 清除单击定时器，避免触发两次跳转
+                    if (clickTimer) {
+                        clearTimeout(clickTimer);
+                        clickTimer = null;
+                    }
+                    
+                    // 双击直接跳转，提供流畅体验
+                    const url = item.getAttribute('data-module-url');
+                    window.location.href = url;
+                });
+            });
+            
+            // 学习资料折叠/展开功能
+            const toggleBtns = document.querySelectorAll('.material-toggle-btn');
+            
+            toggleBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const container = btn.closest('.material-content-container');
+                    const content = container.querySelector('.material-content');
+                    const gradient = container.querySelector('.material-gradient');
+                    const icon = btn.querySelector('i');
+                    const text = btn.querySelector('span');
+                    
+                    // 切换内容显示状态
+                    if (content.style.maxHeight === '400px' || !content.style.maxHeight) {
+                        // 展开
+                        content.style.maxHeight = 'none';
+                        gradient.style.display = 'none';
+                        if (icon) {
+                            icon.setAttribute('data-lucide', 'chevron-up');
+                        }
+                        if (text) {
+                            text.textContent = '收起内容';
+                        }
+                    } else {
+                        // 折叠
+                        content.style.maxHeight = '400px';
+                        gradient.style.display = 'block';
+                        if (icon) {
+                            icon.setAttribute('data-lucide', 'chevron-down');
+                        }
+                        if (text) {
+                            text.textContent = '展开查看全部';
+                        }
+                    }
+                    
+                    // 重新渲染图标
+                    lucide.createIcons();
+                });
+            });
+
+            // 版本选择与内容自定义联动
+            const versionRadios = document.querySelectorAll('input[name="generate_version"]');
+            const contentCheckboxes = document.querySelectorAll('input[name="content_types"]');
+            
+            // 为每个版本单选按钮添加事件监听
+            versionRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const selectedVersion = this.value;
+                    
+                    // 根据选择的版本设置内容自定义选项
+                    contentCheckboxes.forEach(checkbox => {
+                        const contentType = checkbox.value;
+                        
+                        if (selectedVersion === 'detailed') {
+                            // 详细版：全选
+                            checkbox.checked = true;
+                        } else if (selectedVersion === 'normal') {
+                            // 普通版：知识点+考题+总结
+                            checkbox.checked = ['knowledge', 'questions', 'summary'].includes(contentType);
+                        } else if (selectedVersion === 'simple') {
+                            // 简略版：考题+练习题
+                            checkbox.checked = ['questions', 'exercises'].includes(contentType);
+                        }
+                    });
+                });
+            });
+            
+        });
+        
+        // 生成学习资料功能 - 定义在全局作用域
+        function generateMaterials(event, templateId) {
+            event.preventDefault();
+            const form = document.getElementById('generate-materials-form');
+            const formData = new FormData(form);
+            
+            // 获取选中的模块
+            const selectedModules = Array.from(form.querySelectorAll('input[name="modules"]:checked')).map(input => input.value);
+            if (selectedModules.length === 0) {
+                alert('请至少选择一个模块');
+                return;
+            }
+            
+            // 显示生成进度模态框
+            const progressModal = document.createElement('div');
+            progressModal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1001;">
+                    <div style="background: white; padding: 32px; border-radius: 24px; max-width: 500px; width: 100%;">
+                        <div style="text-align: center;">
+                            <div style="margin-bottom: 16px;">
+                                <i data-lucide="loader-2" size="48" style="color: var(--mint); animation: spin 1s linear infinite;"></i>
+                            </div>
+                            <div id="progress-modal-text" style="font-size: 1.1rem; margin-bottom: 8px;">正在生成学习资料...</div>
+                            <div style="height: 8px; background: #E2E8F0; border-radius: 4px; margin: 16px 0;">
+                                <div id="progress-modal-bar" style="height: 100%; width: 0%; background: var(--mint); transition: width 0.3s ease;"></div>
+                            </div>
+                            <div id="progress-modal-percentage" style="font-size: 0.9rem; color: var(--text-secondary);">0%</div>
+                            <div id="progress-modal-desc" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 8px;">AI正在为您生成学习资料，请稍候...</div>
+                            <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center;">
+                                <button id="cancel-generate-btn" class="btn btn-secondary">取消生成</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(progressModal);
+            const progressModalBar = progressModal.querySelector('#progress-modal-bar');
+            const progressModalPercentage = progressModal.querySelector('#progress-modal-percentage');
+            const progressModalDesc = progressModal.querySelector('#progress-modal-desc');
+            const cancelGenerateBtn = progressModal.querySelector('#cancel-generate-btn');
+            
+            // 添加取消生成功能
+            let isCancelled = false;
+            let interval = null;
+            let fetchAbortController = null;
+            
+            cancelGenerateBtn.addEventListener('click', () => {
+                isCancelled = true;
+                if (interval) {
+                    clearInterval(interval);
+                }
+                if (fetchAbortController) {
+                    fetchAbortController.abort();
+                }
+                progressModal.remove();
+                alert('生成已取消');
+            });
+            
+            // 模拟生成进度
+            let progress = 0;
+            interval = setInterval(() => {
+                if (isCancelled) {
+                    return;
+                }
+                
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    if (isCancelled) {
+                        return;
+                    }
+                    
+                    setTimeout(() => {
+                        if (isCancelled) {
+                            return;
+                        }
+                        
+                        // 发送AJAX请求到后端生成学习资料
+                        fetchAbortController = new AbortController();
+                        
+                        fetch('{% url "generate_learning_materials" %}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                            },
+                            body: formData,
+                            signal: fetchAbortController.signal
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            // 关闭进度模态框
+                            progressModal.remove();
+                            
+                            if (isCancelled) {
+                                return;
+                            }
+                            
+                            if (data.success) {
+                                alert('学习资料生成成功！');
+                                // 不刷新页面，直接更新DOM显示新生成的资料
+                                
+                                // 查找推荐学习区域
+                                const recommendedSection = document.querySelector('.study-section:nth-child(3) div[style*="background: white"]');
+                                
+                                if (recommendedSection) {
+                                    // 清空现有内容
+                                    recommendedSection.innerHTML = '';
+                                    
+                                    // 创建AI生成学习资料标题
+                                    const aiTitle = document.createElement('h4');
+                                    aiTitle.innerHTML = '<i data-lucide="brain" size="18" style="color: var(--mint);"></i> AI生成学习资料';
+                                    aiTitle.style.margin = '0 0 15px 0';
+                                    aiTitle.style.color = 'var(--text-primary)';
+                                    aiTitle.style.display = 'flex';
+                                    aiTitle.style.alignItems = 'center';
+                                    aiTitle.style.gap = '8px';
+                                    recommendedSection.appendChild(aiTitle);
+                                    
+                                    // 遍历生成的资料
+                                    data.materials.forEach(material => {
+                                        // 创建资料容器
+                                        const materialDiv = document.createElement('div');
+                                        materialDiv.style.background = '#F7FAFC';
+                                        materialDiv.style.padding = '16px';
+                                        materialDiv.style.borderRadius = '12px';
+                                        materialDiv.style.marginBottom = '16px';
+                                        
+                                        // 创建资料头部
+                                        const materialHeader = document.createElement('div');
+                                        materialHeader.style.display = 'flex';
+                                        materialHeader.style.justifyContent = 'space-between';
+                                        materialHeader.style.alignItems = 'center';
+                                        materialHeader.style.marginBottom = '12px';
+                                        
+                                        // 资料标题
+                                        const materialTitle = document.createElement('h5');
+                                        materialTitle.textContent = `${material.generate_type_display} - ${material.section_name}`;
+                                        materialTitle.style.margin = '0';
+                                        materialTitle.style.color = 'var(--text-primary)';
+                                        materialTitle.style.fontSize = '1rem';
+                                        materialHeader.appendChild(materialTitle);
+                                        
+                                        // 生成时间
+                                        const materialTime = document.createElement('span');
+                                        materialTime.textContent = material.generated_at;
+                                        materialTime.style.fontSize = '0.8rem';
+                                        materialTime.style.color = 'var(--text-secondary)';
+                                        materialHeader.appendChild(materialTime);
+                                        
+                                        materialDiv.appendChild(materialHeader);
+                                        
+                                        // 创建内容容器
+                                        const contentContainer = document.createElement('div');
+                                        contentContainer.className = 'material-content-container';
+                                        
+                                        // 内容区域
+                                        const contentDiv = document.createElement('div');
+                                        contentDiv.className = 'material-content';
+                                        contentDiv.textContent = material.content;
+                                        contentDiv.style.whiteSpace = 'pre-wrap';
+                                        contentDiv.style.lineHeight = '1.6';
+                                        contentDiv.style.color = 'var(--text-primary)';
+                                        contentDiv.style.maxHeight = '400px';
+                                        contentDiv.style.overflow = 'hidden';
+                                        contentContainer.appendChild(contentDiv);
+                                        
+                                        // 渐变遮罩
+                                        const gradientDiv = document.createElement('div');
+                                        gradientDiv.className = 'material-gradient';
+                                        gradientDiv.style.position = 'relative';
+                                        gradientDiv.style.marginTop = '-50px';
+                                        gradientDiv.style.height = '50px';
+                                        gradientDiv.style.background = 'linear-gradient(to bottom, transparent, #F7FAFC)';
+                                        gradientDiv.style.display = 'block';
+                                        contentContainer.appendChild(gradientDiv);
+                                        
+                                        // 折叠/展开按钮
+                                        const toggleBtn = document.createElement('button');
+                                        toggleBtn.className = 'material-toggle-btn';
+                                        toggleBtn.innerHTML = '<i data-lucide="chevron-down" size="16"></i><span>展开查看全部</span>';
+                                        toggleBtn.style.background = 'var(--mint)';
+                                        toggleBtn.style.color = 'white';
+                                        toggleBtn.style.border = 'none';
+                                        toggleBtn.style.padding = '12px 24px';
+                                        toggleBtn.style.borderRadius = '8px';
+                                        toggleBtn.style.fontSize = '0.95rem';
+                                        toggleBtn.style.cursor = 'pointer';
+                                        toggleBtn.style.marginTop = '16px';
+                                        toggleBtn.style.display = 'flex';
+                                        toggleBtn.style.alignItems = 'center';
+                                        toggleBtn.style.gap = '8px';
+                                        toggleBtn.style.width = '100%';
+                                        toggleBtn.style.justifyContent = 'center';
+                                        
+                                        // 添加折叠/展开功能
+                                        toggleBtn.addEventListener('click', () => {
+                                            if (contentDiv.style.maxHeight === '400px' || !contentDiv.style.maxHeight) {
+                                                // 展开
+                                                contentDiv.style.maxHeight = 'none';
+                                                gradientDiv.style.display = 'none';
+                                                const icon = toggleBtn.querySelector('i');
+                                                const text = toggleBtn.querySelector('span');
+                                                if (icon) {
+                                                    icon.setAttribute('data-lucide', 'chevron-up');
+                                                }
+                                                if (text) {
+                                                    text.textContent = '收起内容';
+                                                }
+                                            } else {
+                                                // 折叠
+                                                contentDiv.style.maxHeight = '400px';
+                                                gradientDiv.style.display = 'block';
+                                                const icon = toggleBtn.querySelector('i');
+                                                const text = toggleBtn.querySelector('span');
+                                                if (icon) {
+                                                    icon.setAttribute('data-lucide', 'chevron-down');
+                                                }
+                                                if (text) {
+                                                    text.textContent = '展开查看全部';
+                                                }
+                                            }
+                                            // 重新渲染图标
+                                            lucide.createIcons();
+                                        });
+                                        
+                                        contentContainer.appendChild(toggleBtn);
+                                        materialDiv.appendChild(contentContainer);
+                                        
+                                        // 添加到推荐学习区域
+                                        recommendedSection.appendChild(materialDiv);
+                                    });
+                                    
+                                    // 重新渲染图标
+                                    lucide.createIcons();
+                                }
+                            } else {
+                                alert('学习资料生成失败：' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            // 关闭进度模态框
+                            progressModal.remove();
+                            
+                            if (isCancelled) {
+                                return;
+                            }
+                            
+                            if (error.name === 'AbortError') {
+                                console.log('生成已取消');
+                            } else {
+                                console.error('生成学习资料失败:', error);
+                                alert('学习资料生成失败，请检查网络连接');
+                            }
+                        });
+                    }, 500);
+                }
+                progressModalBar.style.width = `${progress}%`;
+                progressModalPercentage.textContent = `${Math.round(progress)}%`;
+                
+                // 更新进度描述
+                if (progress < 30) {
+                    progressModalDesc.textContent = 'AI正在分析模块内容...';
+                } else if (progress < 60) {
+                    progressModalDesc.textContent = 'AI正在生成学习资料...';
+                } else if (progress < 90) {
+                    progressModalDesc.textContent = 'AI正在优化资料内容...';
+                } else {
+                    progressModalDesc.textContent = 'AI正在整理最终资料...';
+                }
+            }, 200);
+        }
+    </script>
+</body>
+</html>

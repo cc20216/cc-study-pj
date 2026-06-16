@@ -1,0 +1,259 @@
+// 政治学科AI生成功能
+
+// AI生成学习内容按钮
+const aiGenerateBtn = document.getElementById('ai-generate-btn');
+const aiGenerateLinkBtn = document.getElementById('ai-generate-link-btn');
+const aiContentArea = document.getElementById('ai-content-area');
+const aiGeneratedContent = document.getElementById('ai-generated-content');
+const chapterSelect = document.getElementById('chapter-select');
+const detailLevel = document.getElementById('detail-level');
+
+// AI生成内容的核心函数
+function generateContent() {
+    const chapter = chapterSelect.value;
+    const detail = detailLevel.value;
+    
+    // 显示加载状态
+    aiGeneratedContent.innerHTML = `
+        <div style="display: flex; justify-content: center; align-items: center; height: 200px;">
+            <div style="text-align: center;">
+                <i data-lucide="loader-2" size="32" style="color: var(--mint); animation: spin 1s linear infinite;"></i>
+                <p style="margin-top: 10px; color: var(--text-secondary);">正在生成学习内容，请稍候...</p>
+            </div>
+        </div>
+    `;
+    lucide.createIcons();
+    
+    // 模拟AI生成过程（实际项目中应调用真实的AI API）
+    setTimeout(() => {
+        let generatedContent = '';
+        
+        if (chapter === 'all') {
+            generatedContent = generateAllChaptersContent(detail);
+        } else {
+            generatedContent = generateSingleChapterContent(chapter, detail);
+        }
+        
+        aiGeneratedContent.innerHTML = generatedContent;
+    }, 2000);
+}
+
+// 为页面中的AI生成按钮添加事件监听
+if (aiGenerateBtn) {
+    aiGenerateBtn.addEventListener('click', generateContent);
+}
+
+// 为学习工具中的AI生成按钮添加事件监听
+if (aiGenerateLinkBtn) {
+    aiGenerateLinkBtn.addEventListener('click', generateContent);
+}
+
+// 生成全部章节内容
+function generateAllChaptersContent(detail) {
+    const baseContent = `
+        <h6 style="margin: 0 0 10px 0; color: var(--text-primary);">政治概论全部章节学习资料</h6>
+        <p><strong>生成模式：</strong>${detail === 'brief' ? '简略' : '详细'}</p>
+        <p><strong>生成时间：</strong>${new Date().toLocaleString()}</p>
+        <hr style="margin: 15px 0; border: 1px solid var(--border);">
+    `;
+    
+    const briefContent = `
+        <p>本资料涵盖政治概论全部10个章节的核心知识点，适合快速复习和整体把握。</p>
+        <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">核心内容概述：</h6>
+        <ul>
+            <li>马克思主义中国化的历史进程和理论成果</li>
+            <li>毛泽东思想、邓小平理论、"三个代表"重要思想、科学发展观的主要内容</li>
+            <li>习近平新时代中国特色社会主义思想的核心要义、世界观和方法论</li>
+            <li>新时代坚持和发展中国特色社会主义的基本方略</li>
+            <li>全面建设社会主义现代化国家的目标和战略</li>
+        </ul>
+        <p style="margin-top: 15px; color: var(--text-secondary);">
+            建议结合各章节详细内容进行深入学习，重点掌握中国特色社会主义理论体系的形成和发展。
+        </p>
+    `;
+    
+    const detailedContent = `
+        <p>本资料详细涵盖政治概论全部10个章节的内容，包括理论背景、核心观点、实践意义等方面。</p>
+        <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">第一章：马克思主义中国化时代化的历史进程</h6>
+        <p><strong>主要内容：</strong>马克思主义中国化的科学内涵、历史进程、理论成果及其相互关系。</p>
+        <p><strong>核心观点：</strong>马克思主义基本原理同中国具体实际相结合、同中华优秀传统文化相结合。</p>
+        
+        <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">第二章：毛泽东思想及其历史地位</h6>
+        <p><strong>主要内容：</strong>毛泽东思想的形成和发展、主要内容、历史地位和指导意义。</p>
+        <p><strong>活的灵魂：</strong>实事求是、群众路线、独立自主。</p>
+        
+        <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">第三章：邓小平理论</h6>
+        <p><strong>主要内容：</strong>邓小平理论的形成和发展、主要内容、历史地位和指导意义。</p>
+        <p><strong>首要的基本的理论问题：</strong>什么是社会主义、怎样建设社会主义。</p>
+        
+        <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">后续章节：</h6>
+        <p>本资料还详细涵盖了"三个代表"重要思想、科学发展观、习近平新时代中国特色社会主义思想等内容，由于篇幅限制，此处仅展示部分章节。完整内容请使用"简略生成"模式或选择具体章节查看。</p>
+    `;
+    
+    return baseContent + (detail === 'brief' ? briefContent : detailedContent);
+}
+
+// 生成单个章节内容
+function generateSingleChapterContent(chapter, detail) {
+    const chapterMap = {
+        '1': { title: '第一章', name: '马克思主义中国化时代化的历史进程' },
+        '2': { title: '第二章', name: '毛泽东思想及其历史地位' },
+        '3': { title: '第三章', name: '邓小平理论' },
+        '4': { title: '第四章', name: '"三个代表"重要思想' },
+        '5': { title: '第五章', name: '科学发展观' },
+        '6': { title: '第六章', name: '习近平新时代中国特色社会主义思想的世界观和方法论' },
+        '7': { title: '第七章', name: '习近平新时代中国特色社会主义思想的核心要义' },
+        '8': { title: '第八章', name: '全面建设社会主义现代化国家' },
+        '9': { title: '第九章', name: '坚持和发展中国特色社会主义的总任务' },
+        '10': { title: '第十章', name: '中国特色社会主义经济建设' }
+    };
+    
+    const currentChapter = chapterMap[chapter];
+    
+    const baseContent = `
+        <h6 style="margin: 0 0 10px 0; color: var(--text-primary);">${currentChapter.title}：${currentChapter.name}</h6>
+        <p><strong>生成模式：</strong>${detail === 'brief' ? '简略' : '详细'}</p>
+        <p><strong>生成时间：</strong>${new Date().toLocaleString()}</p>
+        <hr style="margin: 15px 0; border: 1px solid var(--border);">
+    `;
+    
+    const briefContent = `
+        <p>本资料涵盖${currentChapter.title}的核心知识点，适合快速复习和重点把握。</p>
+        <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">核心知识点：</h6>
+        <ul>
+            <li>${currentChapter.name}的基本概念和科学内涵</li>
+            <li>该章节的核心观点和主要内容</li>
+            <li>理论的历史地位和实践意义</li>
+        </ul>
+        <p style="margin-top: 15px; color: var(--text-secondary);">
+            建议结合章节练习题和实际案例进行深入理解，重点掌握理论的应用价值。
+        </p>
+    `;
+    
+    const detailedContent = `
+        <p>本资料详细涵盖${currentChapter.title}的内容，包括理论背景、核心观点、实践意义等方面。</p>
+        <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">一、理论背景</h6>
+        <p>1. 时代背景：国际国内形势的变化和发展需求</p>
+        <p>2. 实践基础：中国革命、建设和改革的实践经验</p>
+        <p>3. 理论渊源：马克思列宁主义基本原理</p>
+        
+        <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">二、核心观点</h6>
+        <p>1. 基本概念：${currentChapter.name}的科学内涵和定义</p>
+        <p>2. 主要内容：该理论的核心观点和基本框架</p>
+        <p>3. 理论体系：各部分内容之间的逻辑关系</p>
+        
+        <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">三、实践意义</h6>
+        <p>1. 历史意义：对中国革命、建设和改革的指导作用</p>
+        <p>2. 现实意义：对当前中国特色社会主义建设的指导价值</p>
+        <p>3. 世界意义：对世界社会主义运动和发展中国家的启示</p>
+        
+        <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">四、学习建议</h6>
+        <p>1. 重点掌握：核心观点和基本原理</p>
+        <p>2. 联系实际：结合当前社会热点和实践案例</p>
+        <p>3. 融会贯通：与其他章节内容联系起来学习</p>
+    `;
+    
+    return baseContent + (detail === 'brief' ? briefContent : detailedContent);
+}
+
+// 毛泽东思想AI生成按钮
+const aiGenerateMaoBtn = document.getElementById('ai-generate-mao-btn');
+
+if (aiGenerateMaoBtn) {
+    aiGenerateMaoBtn.addEventListener('click', () => {
+        aiGeneratedContent.innerHTML = `
+            <div style="display: flex; justify-content: center; align-items: center; height: 200px;">
+                <div style="text-align: center;">
+                    <i data-lucide="loader-2" size="32" style="color: var(--mint); animation: spin 1s linear infinite;"></i>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">正在生成毛泽东思想学习资料，请稍候...</p>
+                </div>
+            </div>
+        `;
+        lucide.createIcons();
+        
+        // 模拟AI生成过程
+        setTimeout(() => {
+            const generatedContent = `
+                <h6 style="margin: 0 0 10px 0; color: var(--text-primary);">毛泽东思想学习资料</h6>
+                <p><strong>生成时间：</strong>${new Date().toLocaleString()}</p>
+                <hr style="margin: 15px 0; border: 1px solid var(--border);">
+                <p>毛泽东思想是马克思列宁主义在中国的创造性运用和发展，是被实践证明了的关于中国革命和建设的正确的理论原则和经验总结。</p>
+                
+                <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">一、毛泽东思想的形成和发展</h6>
+                <p>1. 萌芽时期（1921-1927）：关于新民主主义革命的基本思想</p>
+                <p>2. 形成时期（1927-1935）：农村包围城市、武装夺取政权的理论</p>
+                <p>3. 成熟时期（1935-1945）：新民主主义革命理论体系的形成</p>
+                <p>4. 继续发展时期（1945-1976）：关于社会主义革命和建设的理论</p>
+                
+                <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">二、毛泽东思想的活的灵魂</h6>
+                <p>1. 实事求是：一切从实际出发，理论联系实际，实事求是，在实践中检验真理和发展真理</p>
+                <p>2. 群众路线：一切为了群众，一切依靠群众，从群众中来，到群众中去</p>
+                <p>3. 独立自主：坚持独立思考，走自己的路，坚定不移地维护民族独立、捍卫国家主权</p>
+                
+                <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">三、毛泽东思想的历史地位</h6>
+                <p>1. 马克思主义中国化的第一个重大理论成果</p>
+                <p>2. 中国革命和建设的科学指南</p>
+                <p>3. 中国共产党和中国人民宝贵的精神财富</p>
+            `;
+            
+            aiGeneratedContent.innerHTML = generatedContent;
+        }, 1500);
+    });
+}
+
+// 邓小平理论AI生成按钮
+const aiGenerateDengBtn = document.getElementById('ai-generate-deng-btn');
+
+if (aiGenerateDengBtn) {
+    aiGenerateDengBtn.addEventListener('click', () => {
+        aiGeneratedContent.innerHTML = `
+            <div style="display: flex; justify-content: center; align-items: center; height: 200px;">
+                <div style="text-align: center;">
+                    <i data-lucide="loader-2" size="32" style="color: var(--mint); animation: spin 1s linear infinite;"></i>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">正在生成邓小平理论学习资料，请稍候...</p>
+                </div>
+            </div>
+        `;
+        lucide.createIcons();
+        
+        // 模拟AI生成过程
+        setTimeout(() => {
+            const generatedContent = `
+                <h6 style="margin: 0 0 10px 0; color: var(--text-primary);">邓小平理论学习资料</h6>
+                <p><strong>生成时间：</strong>${new Date().toLocaleString()}</p>
+                <hr style="margin: 15px 0; border: 1px solid var(--border);">
+                <p>邓小平理论是马克思列宁主义的基本原理同当代中国实践和时代特征相结合的产物，是毛泽东思想在新的历史条件下的继承和发展。</p>
+                
+                <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">一、邓小平理论的形成和发展</h6>
+                <p>1. 初步形成：关于真理标准问题的讨论和党的十一届三中全会</p>
+                <p>2. 逐步展开：党的十二大到十三大</p>
+                <p>3. 成熟并形成体系：党的十三大到十四大</p>
+                <p>4. 确立为党的指导思想：党的十五大</p>
+                
+                <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">二、邓小平理论的核心内容</h6>
+                <p>1. 社会主义初级阶段理论</p>
+                <p>2. 社会主义本质理论：解放生产力，发展生产力，消灭剥削，消除两极分化，最终达到共同富裕</p>
+                <p>3. 改革开放理论</p>
+                <p>4. 社会主义市场经济理论</p>
+                <p>5. 社会主义现代化发展战略</p>
+                
+                <h6 style="margin: 15px 0 10px 0; color: var(--text-primary);">三、邓小平理论的历史地位</h6>
+                <p>1. 马克思主义中国化的第二次历史性飞跃</p>
+                <p>2. 中国特色社会主义理论体系的开篇之作</p>
+                <p>3. 改革开放和社会主义现代化建设的科学指南</p>
+            `;
+            
+            aiGeneratedContent.innerHTML = generatedContent;
+        }, 1500);
+    });
+}
+
+// 添加旋转动画
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+`;
+document.head.appendChild(style);

@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专升本C语言学习 - StudyFlow</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 复用首页样式 */
+        :root {
+            --bg-main: #F8FAFB;
+            --card-bg: #FFFFFF;
+            --mint: #81C784;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --border: #EDF2F7;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, "Noto Sans SC", sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        nav {
+            height: 64px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            padding: 24px 40px;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            height: fit-content;
+            position: sticky;
+            top: 24px;
+        }
+
+        .main-content {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            min-height: calc(100vh - 112px);
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--mint);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #66BB6A;
+        }
+
+        .btn-secondary {
+            background: #E2E8F0;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #CBD5E0;
+        }
+
+        /* 模块列表 */
+        .module-list {
+            margin-top: 20px;
+        }
+
+        .module-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .module-item:hover {
+            background: #F7FAFC;
+        }
+
+        .module-item.active {
+            background: rgba(129, 199, 132, 0.1);
+            border-left: 4px solid var(--mint);
+            font-weight: 500;
+        }
+
+        .module-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* 学习内容 */
+        .study-content {
+            margin-top: 20px;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .module-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .module-target {
+            background: #F7FAFC;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .study-section {
+            background: #F7FAFC;
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        /* 悬浮按钮样式 */
+        .floating-buttons {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 999;
+        }
+        
+        .floating-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: var(--mint);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+        
+        .floating-btn:hover {
+            background: #66BB6A;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .floating-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 悬浮按钮图标样式 */
+        .floating-btn i {
+            width: 24px;
+            height: 24px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 250px 1fr;
+                gap: 20px;
+                padding: 20px 30px;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            nav {
+                padding: 0 20px;
+            }
+            
+            /* 侧边栏 */
+            .sidebar {
+                position: static;
+                order: 2;
+            }
+            
+            /* 主内容 */
+            .main-content {
+                order: 1;
+            }
+            
+            /* 学习模块列表 */
+            .module-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 8px;
+            }
+            
+            .module-item {
+                margin-bottom: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+                gap: 16px;
+            }
+            
+            nav {
+                padding: 0 16px;
+            }
+            
+            /* 模块标题 */
+            .module-title {
+                font-size: 1.3rem !important;
+            }
+            
+            /* 学习部分 */
+            .study-section {
+                padding: 20px !important;
+            }
+            
+            /* 进度卡片 */
+            .study-section:nth-child(2) div {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+            
+            /* 按钮组 */
+            .study-section:nth-child(3) div {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+            
+            /* 悬浮按钮响应式调整 */
+            .floating-buttons {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .floating-btn {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .floating-btn i {
+                width: 20px;
+                height: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* 按钮 */
+            .btn {
+                padding: 10px 16px !important;
+                font-size: 0.85rem !important;
+            }
+            
+            /* 模块列表 */
+            .module-list {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'home' %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 10px; font-weight: bold; color: var(--mint); font-size: 1.2rem;">
+                <i data-lucide="leaf"></i> StudyFlow
+            </div>
+        </a>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: var(--text-primary);">首页</a>
+            <a href="{% url 'template_management' %}" class="btn btn-secondary">
+                <i data-lucide="clipboard-list" size="16"></i>
+                模板管理
+            </a>
+            <a href="{% url 'logout' %}" style="background: #E2E8F0; padding: 8px 16px; border-radius: 8px; text-decoration: none; color: var(--text-primary); font-size: 0.9rem;">退出登录</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 左侧模块列表 -->
+        <div class="sidebar">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="code" size="20" style="color: var(--mint);"></i>
+                <h2>专升本C语言学习模块</h2>
+            </div>
+            <div class="module-list">
+                {% for module in modules %}
+                    <div class="module-item {% if current_module.name == module.name %}active{% endif %}" 
+                         data-module-url="/c_language/study/{{ module.name }}/">
+                        <div class="module-color" style="background-color: {{ module.color_code }};"></div>
+                        <span>{{ module.name }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 右侧学习内容 -->
+        <div class="main-content">
+            <div class="module-header">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="module-color" style="background-color: {{ current_module.color_code }}; width: 24px; height: 24px;"></div>
+                    <h1 class="module-title">{{ current_module.name }}</h1>
+                </div>
+                <div class="module-target">
+                    今日目标: {{ current_module.target_value }}个/分钟
+                </div>
+            </div>
+
+            <div class="study-content">
+                <!-- 学习内容区域 -->
+                <div class="study-section">
+                    <h3 class="section-title">学习内容</h3>
+                    <p>欢迎来到专升本C语言 {{ current_module.name }}模块学习！</p>
+                    <p style="color: var(--text-secondary); margin-top: 10px;">
+                        这里将展示该模块的详细学习内容，包括练习、资料和进度追踪功能。
+                    </p>
+                </div>
+
+                <!-- 学习进度 -->
+                <div class="study-section">
+                    <h3 class="section-title">学习进度</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">今日完成</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--mint);">{{ study_progress.today_completed }}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">/ {{ current_module.target_value }}</div>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">累计完成</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--mint);">{{ study_progress.total_completed }}</div>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">完成率</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--mint);">{{ study_progress.completion_rate }}%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 推荐学习模块 -->
+                <div class="study-section">
+                    <h3 class="section-title">推荐学习模块</h3>
+                    <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                        {% if current_module.name == '语法' %}
+                            <!-- 语法功能区 -->
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">C语言语法学习功能</h4>
+                                <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
+                                    <button id="random-check-btn" class="btn btn-primary">
+                                        <i data-lucide="shuffle" size="16"></i>
+                                        随机抽查
+                                    </button>
+                                    <div style="display: flex; gap: 8px; align-items: center;">
+                                        <input type="text" id="syntax-search" placeholder="搜索语法点..." 
+                                               style="padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; flex: 1; min-width: 200px;">
+                                        <button id="search-btn" class="btn btn-secondary">
+                                            <i data-lucide="search" size="16"></i>
+                                            搜索
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 随机抽查区域 -->
+                            <div id="random-check-area" style="margin-bottom: 20px; padding: 20px; background: #F7FAFC; border-radius: 12px; display: none;">
+                                <h5 style="margin: 0 0 15px 0; color: var(--text-primary);">随机抽查</h5>
+                                <div id="random-syntax" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; color: var(--text-primary);">--</div>
+                                <div id="random-syntax-meaning" style="margin-bottom: 15px; color: var(--text-secondary);">点击"随机抽查"开始</div>
+                                <div style="display: flex; gap: 12px;">
+                                    <button id="show-meaning-btn" class="btn btn-secondary">显示释义</button>
+                                    <button id="next-syntax-btn" class="btn btn-primary">下一个</button>
+                                    <button id="known-btn" class="btn btn-secondary">已掌握</button>
+                                </div>
+                            </div>
+
+                            <!-- C语言语法示例 -->
+                            <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">C语言基础语法</h4>
+                            <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+                                <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+                                    <li><strong>变量声明</strong> - int a = 10;</li>
+                                    <li><strong>条件语句</strong> - if (a > 5) { printf("a大于5"); }</li>
+                                    <li><strong>循环语句</strong> - for (int i = 0; i < 10; i++) { }</li>
+                                    <li><strong>函数定义</strong> - int add(int a, int b) { return a + b; }</li>
+                                    <li><strong>数组</strong> - int arr[5] = {1, 2, 3, 4, 5};</li>
+                                    <li><strong>指针</strong> - int *p = &a;</li>
+                                    <li><strong>结构体</strong> - struct Student { char name[20]; int age; };</li>
+                                    <li><strong>动态内存</strong> - int *p = (int*)malloc(sizeof(int));</li>
+                                    <li><strong>文件操作</strong> - FILE *fp = fopen("file.txt", "r");</li>
+                                    <li><strong>字符串处理</strong> - char str[20] = "Hello";</li>
+                                    <li><strong>预处理器</strong> - #include <stdio.h></li>
+                                    <li><strong>宏定义</strong> - #define PI 3.14159</li>
+                                    <li><strong>位运算</strong> - int result = a & b;</li>
+                                    <li><strong>枚举</strong> - enum Color { RED, GREEN, BLUE };</li>
+                                    <li><strong>联合</strong> - union Data { int i; float f; char str[20]; };</li>
+                                    <li><strong>类型转换</strong> - float f = (float)a;</li>
+                                    <li><strong>静态变量</strong> - static int count = 0;</li>
+                                    <li><strong>递归函数</strong> - int factorial(int n) { if(n == 0) return 1; return n * factorial(n-1); }</li>
+                                    <li><strong>命令行参数</strong> - int main(int argc, char *argv[]) { }</li>
+                                    <li><strong>错误处理</strong> - perror("Error");</li>
+                                </ul>
+                            </div>
+                            <p style="margin: 15px 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+                                以上为C语言基础语法示例，建议每天学习5-10个语法点，结合实例代码理解。
+                            </p>
+                        {% elif current_module.name == '编程题' %}
+                            <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">编程题练习</h4>
+                            <p style="margin: 0 0 15px; color: var(--text-primary);">
+                                编程题是专升本C语言考试中的重要部分，主要考察考生的编程能力和问题解决能力。
+                            </p>
+                            <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">推荐练习题目：</h5>
+                            <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+                                <li>编写一个程序，计算1到100的和</li>
+                                <li>编写一个程序，判断一个数是否为素数</li>
+                                <li>编写一个程序，实现冒泡排序算法</li>
+                                <li>编写一个程序，求两个数的最大公约数和最小公倍数</li>
+                                <li>编写一个程序，实现字符串反转</li>
+                                <li>编写一个程序，计算阶乘</li>
+                                <li>编写一个程序，实现斐波那契数列</li>
+                                <li>编写一个程序，判断一个字符串是否为回文</li>
+                            </ul>
+                            <p style="margin: 15px 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+                                建议每天至少完成2道编程题，注重解题思路和代码规范。
+                            </p>
+                        {% elif current_module.name == '知识点' %}
+                            <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">C语言知识点</h4>
+                            <p style="margin: 0 0 15px; color: var(--text-primary);">
+                                C语言知识点是专升本考试的基础，主要包括数据类型、运算符、控制结构、函数、数组、指针等内容。
+                            </p>
+                            <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">核心知识点：</h5>
+                            <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+                                <li>数据类型：基本数据类型、构造数据类型、指针类型</li>
+                                <li>运算符：算术运算符、关系运算符、逻辑运算符、赋值运算符</li>
+                                <li>控制结构：顺序结构、选择结构、循环结构</li>
+                                <li>函数：函数定义、函数调用、参数传递、递归函数</li>
+                                <li>数组：一维数组、二维数组、字符数组、数组指针</li>
+                                <li>指针：指针定义、指针运算、指针与数组、指针与函数</li>
+                                <li>结构体：结构体定义、结构体变量、结构体指针、结构体数组</li>
+                                <li>文件操作：文件打开、文件读写、文件关闭</li>
+                            </ul>
+                            <p style="margin: 15px 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+                                建议每天复习2-3个知识点，结合实例加深理解。
+                            </p>
+                        {% elif current_module.name == '模拟题' %}
+                            <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">模拟题练习</h4>
+                            <p style="margin: 0 0 15px; color: var(--text-primary);">
+                                模拟题是检验学习效果的重要手段，通过做模拟题可以熟悉考试题型和难度。
+                            </p>
+                            <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">模拟题类型：</h5>
+                            <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+                                <li>单选题：考察基础知识和概念</li>
+                                <li>填空题：考察关键知识点和语法细节</li>
+                                <li>程序阅读题：考察代码理解能力</li>
+                                <li>程序填空题：考察代码补全能力</li>
+                                <li>编程题：考察编程能力和问题解决能力</li>
+                            </ul>
+                            <p style="margin: 15px 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+                                建议每周至少完成1套模拟题，严格按照考试时间进行。
+                            </p>
+                        {% else %}
+                            <p style="color: var(--text-secondary);">
+                                该模块的推荐学习内容正在整理中，敬请期待...
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- 学习工具 -->
+                <div class="study-section">
+                    <h3 class="section-title">学习工具</h3>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <a href="{% url 'study_session' %}" class="btn btn-primary">
+                            <i data-lucide="clock" size="16"></i>
+                            开始计时学习
+                        </a>
+                        <a href="{% url 'daily_progress' %}" class="btn btn-secondary">
+                            <i data-lucide="pencil" size="16"></i>
+                            记录学习进度
+                        </a>
+                        <a href="/c_language/materials/{{ current_module.name }}/" class="btn btn-secondary">
+                            <i data-lucide="book" size="16"></i>
+                            查看学习资料
+                        </a>
+                        <a href="#" class="btn btn-secondary">
+                            <i data-lucide="bar-chart-2" size="16"></i>
+                            查看学习统计
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 悬浮按钮 -->
+    <div class="floating-buttons">
+        <!-- 返回首页按钮 -->
+        <button class="floating-btn" id="home-btn" title="返回首页" onclick="window.location.href='{% url 'home' %}'">
+            <i data-lucide="home"></i>
+        </button>
+        <!-- 回到顶部按钮 -->
+        <button class="floating-btn" id="to-top-btn" title="回到顶部">
+            <i data-lucide="arrow-up"></i>
+        </button>
+        <!-- 回到底部按钮 -->
+        <button class="floating-btn" id="to-bottom-btn" title="回到底部">
+            <i data-lucide="arrow-down"></i>
+        </button>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // 悬浮按钮功能
+        document.addEventListener('DOMContentLoaded', () => {
+            // 回到顶部按钮
+            const toTopBtn = document.getElementById('to-top-btn');
+            toTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // 回到底部按钮
+            const toBottomBtn = document.getElementById('to-bottom-btn');
+            toBottomBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: 'smooth'
+                });
+            });
+
+            // 学习模块点击和双击处理
+            const moduleItems = document.querySelectorAll('.module-item');
+            let clickTimer = null;
+
+            moduleItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // 清除之前的定时器
+                    if (clickTimer) {
+                        clearTimeout(clickTimer);
+                    }
+                    
+                    // 设置单击定时器
+                    clickTimer = setTimeout(() => {
+                        const url = item.getAttribute('data-module-url');
+                        window.location.href = url;
+                    }, 200); // 200ms延迟判断是单击还是双击
+                });
+
+                item.addEventListener('dblclick', () => {
+                    // 清除单击定时器，避免触发两次跳转
+                    if (clickTimer) {
+                        clearTimeout(clickTimer);
+                        clickTimer = null;
+                    }
+                    
+                    // 双击直接跳转，提供流畅体验
+                    const url = item.getAttribute('data-module-url');
+                    window.location.href = url;
+                });
+            });
+        });
+
+        // C语言语法数据
+        const syntaxData = [
+            { syntax: "变量声明", meaning: "用于声明程序中使用的变量，指定变量的类型和名称" },
+            { syntax: "条件语句", meaning: "根据条件执行不同的代码块，包括if、else if、else、switch等" },
+            { syntax: "循环语句", meaning: "重复执行一段代码，包括for、while、do-while等" },
+            { syntax: "函数定义", meaning: "定义可重用的代码块，包括函数名、参数列表和返回类型" },
+            { syntax: "数组", meaning: "用于存储多个相同类型的数据，包括一维数组和多维数组" },
+            { syntax: "指针", meaning: "指向内存地址的变量，可以用于间接访问和修改内存中的数据" },
+            { syntax: "结构体", meaning: "用于组合不同类型的数据，形成新的数据类型" },
+            { syntax: "动态内存", meaning: "在程序运行时分配和释放内存，包括malloc、calloc、realloc、free等函数" },
+            { syntax: "文件操作", meaning: "用于读写外部文件，包括fopen、fclose、fread、fwrite等函数" },
+            { syntax: "字符串处理", meaning: "用于处理字符数组，包括strcpy、strlen、strcmp等函数" }
+        ];
+
+        let currentSyntaxIndex = -1;
+        let showingMeaning = false;
+
+        // 随机抽查功能
+        const randomCheckBtn = document.getElementById('random-check-btn');
+        const randomCheckArea = document.getElementById('random-check-area');
+        const randomSyntax = document.getElementById('random-syntax');
+        const randomSyntaxMeaning = document.getElementById('random-syntax-meaning');
+        const showMeaningBtn = document.getElementById('show-meaning-btn');
+        const nextSyntaxBtn = document.getElementById('next-syntax-btn');
+        const knownBtn = document.getElementById('known-btn');
+
+        if (randomCheckBtn) {
+            randomCheckBtn.addEventListener('click', () => {
+                randomCheckArea.style.display = 'block';
+                showNextRandomSyntax();
+            });
+        }
+
+        const showNextRandomSyntax = () => {
+            currentSyntaxIndex = Math.floor(Math.random() * syntaxData.length);
+            randomSyntax.textContent = syntaxData[currentSyntaxIndex].syntax;
+            randomSyntaxMeaning.textContent = '点击"显示释义"查看释义';
+            showingMeaning = false;
+        };
+
+        if (showMeaningBtn) {
+            showMeaningBtn.addEventListener('click', () => {
+                if (!showingMeaning) {
+                    randomSyntaxMeaning.textContent = syntaxData[currentSyntaxIndex].meaning;
+                    showingMeaning = true;
+                }
+            });
+        }
+
+        if (nextSyntaxBtn) {
+            nextSyntaxBtn.addEventListener('click', () => {
+                showNextRandomSyntax();
+            });
+        }
+
+        if (knownBtn) {
+            knownBtn.addEventListener('click', () => {
+                // 这里可以添加已掌握语法点的处理逻辑
+                alert('已标记为掌握！');
+                showNextRandomSyntax();
+            });
+        }
+
+        // 语法搜索功能
+        const searchBtn = document.getElementById('search-btn');
+        const syntaxSearch = document.getElementById('syntax-search');
+
+        const searchSyntax = () => {
+            const query = syntaxSearch.value.trim().toLowerCase();
+            if (!query) {
+                return;
+            }
+
+            const results = syntaxData.filter(item => 
+                item.syntax.toLowerCase().includes(query) || 
+                item.meaning.toLowerCase().includes(query)
+            );
+
+            if (results.length > 0) {
+                alert(`找到 ${results.length} 个相关语法点：\n${results.map(r => `${r.syntax}: ${r.meaning}`).join('\n')}`);
+            } else {
+                alert('未找到匹配的语法点');
+            }
+        };
+
+        if (searchBtn) {
+            searchBtn.addEventListener('click', searchSyntax);
+        }
+
+        if (syntaxSearch) {
+            syntaxSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    searchSyntax();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习进度 - StudyFlow</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 复用首页样式 */
+        :root {
+            --bg-main: #F5F7FA;
+            --card-bg: #FFFFFF;
+            --primary-color: #4A90E2;
+            --secondary-color: #50E3C2;
+            --accent-color: #F5A623;
+            --text-primary: #333333;
+            --text-secondary: #777777;
+            --border: #E1E8ED;
+            --success-color: #7ED321;
+            --warning-color: #F8E71C;
+            --error-color: #D0021B;
+            --light-blue: #E8F4F8;
+            --light-green: #E8F8F1;
+            --light-orange: #FFF8E1;
+            --mint: #81C784;
+        }
+
+        /* 暗夜模式变量 */
+        :root.dark {
+            --bg-main: #1A202C;
+            --card-bg: #2D3748;
+            --primary-color: #6366f1;
+            --secondary-color: #81C784;
+            --accent-color: #f59e0b;
+            --text-primary: white;
+            --text-secondary: #A0AEC0;
+            --border: #4A5568;
+            --success-color: #81C784;
+            --warning-color: #F8E71C;
+            --error-color: #EF4444;
+            --light-blue: #2D3748;
+            --light-green: #2D3748;
+            --light-orange: #2D3748;
+            --mint: #81C784;
+        }
+
+        /* 确保所有元素在暗夜模式下正确显示 */
+        :root.dark {
+            /* 强制所有文本元素使用浅色文字 */
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            p,
+            span,
+            div,
+            select,
+            option,
+            li,
+            i,
+            label {
+                color: white !important;
+            }
+
+            /* 强制所有卡片和容器使用深色背景 */
+            .card,
+            .chart-container,
+            #records-container div,
+            #daily-progress-container div,
+            div[style*="background: white"],
+            div[style*="background-color: white"],
+            div[style*="background: #FFF"],
+            div[style*="background: #ffffff"],
+            div[style*="background: var(--light-blue)"],
+            div[style*="background: var(--light-green)"],
+            div[style*="background: var(--light-orange)"],
+            label[style*="background: white"] {
+                background-color: var(--card-bg) !important;
+                border-color: var(--border) !important;
+            }
+
+            /* 强制所有输入框和表单元素使用深色背景和浅色文字 */
+            input[type="text"],
+            textarea,
+            select {
+                background-color: #4A5568 !important;
+                color: white !important;
+                border-color: var(--border) !important;
+            }
+
+            /* 确保边框样式 */
+            .card,
+            .chart-container,
+            #records-container div,
+            #daily-progress-container div,
+            div[style*="background: white"],
+            div[style*="background-color: white"],
+            div[style*="background: #FFF"],
+            div[style*="background: #ffffff"],
+            div[style*="background: var(--light-blue)"],
+            div[style*="background: var(--light-green)"],
+            div[style*="background: var(--light-orange)"],
+            label[style*="background: white"] {
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+            }
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, "Noto Sans SC", sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        nav {
+            height: 64px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            padding: 24px 40px;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+                gap: 16px;
+            }
+            
+            nav {
+                padding: 0 16px;
+            }
+        }
+
+        /* 图表容器 */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+        
+        /* 响应式图表容器 */
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .chart-container {
+                height: 250px;
+                padding: 16px;
+            }
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            height: 300px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 轮播容器 */
+        .carousel-container {
+            margin: 24px 0;
+            position: relative;
+        }
+
+        .carousel {
+            display: flex;
+            overflow: hidden;
+            border-radius: 16px;
+        }
+
+        .carousel-item {
+            min-width: 100%;
+            padding: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            box-sizing: border-box;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #357ABD;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #F0F4F8;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #E1E8ED;
+            transform: translateY(-2px);
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary-color);
+            color: white;
+            border: 2px solid var(--primary-color);
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            z-index: 1000;
+            opacity: 0.8;
+            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+        }
+        
+        .back-btn:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'home' %}" class="back-btn">返回首页</a>
+    
+    <nav>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+                <div style="display: flex; align-items: center; gap: 10px; font-weight: bold; color: var(--mint); font-size: 1.2rem;">
+                    <i data-lucide="leaf"></i> StudyFlow
+                </div>
+            </a>
+            <button id="dark-mode-toggle" style="background: transparent; border: none; cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; color: var(--text-primary);">
+                <i data-lucide="moon" size="20"></i>
+            </button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <span style="font-size: 0.9rem; color: var(--text-secondary);">{{ today_date }}</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 24px;">
+            <div>
+                <h2>学习进度看板</h2>
+                <p style="color: var(--text-secondary); margin: 10px 0 0;">追踪你的学习进度，查看详细统计数据</p>
+            </div>
+            <a href="{% url 'daily_progress' %}" class="btn btn-primary" style="text-decoration: none; display: inline-block;">
+                <i data-lucide="pencil" size="18" style="vertical-align: middle; margin-right: 8px;"></i>
+                填写今日进度
+            </a>
+        </div>
+
+        <!-- 学习数据概览 -->
+        <div class="card" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+            <div style="text-align: center; padding: 20px; background: var(--light-blue); border-radius: 16px; border: 1px solid rgba(74, 144, 226, 0.2);">
+                    <h3 style="color: var(--text-primary);">累计学习时长</h3>
+                    <div style="font-size: 2.5rem; font-weight: bold; color: var(--primary-color); margin: 10px 0;">
+                        {{ total_study_time }}h
+                    </div>
+                    <p style="color: var(--text-secondary);">总学习时长</p>
+                </div>
+                <div style="text-align: center; padding: 20px; background: var(--light-green); border-radius: 16px; border: 1px solid rgba(80, 227, 194, 0.2);">
+                    <h3 style="color: var(--text-primary);">近7天学习时长</h3>
+                    <div style="font-size: 2.5rem; font-weight: bold; color: var(--secondary-color); margin: 10px 0;">
+                        {{ recent_study_time }}h
+                    </div>
+                    <p style="color: var(--text-secondary);">本周学习时长</p>
+                </div>
+                <div style="text-align: center; padding: 20px; background: var(--light-orange); border-radius: 16px; border: 1px solid rgba(245, 166, 35, 0.2);">
+                    <h3 style="color: var(--text-primary);">整体进度</h3>
+                    <div style="font-size: 2.5rem; font-weight: bold; color: var(--accent-color); margin: 10px 0;">
+                        {{ overall_progress }}%
+                    </div>
+                    <p style="color: var(--text-secondary);">学习计划完成度</p>
+                </div>
+        </div>
+
+        <!-- 模板选择器 -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>选择学习模板</h3>
+                <form method="GET" action="" style="margin: 0; display: flex; align-items: center;">
+                    <select name="template_id" onchange="this.form.submit()" style="padding: 8px 12px; border: 1px solid #EDF2F7; border-radius: 8px; background: white; margin-right: 12px;">
+                        {% for template in templates %}
+                            <option value="{{ template.id }}" {% if template.id|stringformat:'s' == selected_template_id|stringformat:'s' %}selected{% endif %}>
+                                {{ template.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <span style="color: #7F8C8D;">当前模板：{{ current_template.name }}</span>
+                </form>
+            </div>
+        </div>
+
+        <!-- 当前学习计划模块进度 -->
+        <div class="card">
+            <h3>当前学习计划</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+                <div style="text-align: center;">
+                    <h4 style="margin-bottom: 16px;">{{ current_template.name }}</h4>
+                    <p style="font-size: 1.2rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px;">总进度</p>
+                    <div style="font-size: 2.5rem; font-weight: bold; color: var(--mint); margin-bottom: 16px;">{{ overall_progress }}%</div>
+                </div>
+                
+                <!-- 模块详细进度 -->
+                {% if current_template %}
+                    {% for module in current_template.modules.all %}
+                        {% for key, value in module_progress_map.items %}
+                            {% if key == module.name %}
+                                <div style="background: white; padding: 20px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 1px solid var(--border);">
+                                    <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">{{ module.name }}</div>
+                                    <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);">{{ value }}</div>
+                                    {% if value == 100 %}
+                                        <div style="margin-top: 12px; font-size: 0.85rem; color: var(--success-color); display: flex; align-items: center; gap: 8px;">
+                                            <i data-lucide="check-circle" size="16"></i>
+                                            ✅ 恭喜你完成了该模块！继续保持！
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="charts-grid">
+            <!-- 模块完成率饼图 -->
+            <div class="chart-container">
+                <h3>模块完成率</h3>
+                <canvas id="completion-chart" style="width: 100%; height: 250px;"></canvas>
+            </div>
+
+            <!-- 每日学习量折线图 -->
+            <div class="chart-container">
+                <h3>每日学习量</h3>
+                <canvas id="daily-chart" style="width: 100%; height: 250px;"></canvas>
+            </div>
+
+            <!-- 知识点掌握情况 - 支持横向滚动 -->
+            <div class="chart-container">
+                <h3>知识点掌握情况</h3>
+                <div style="overflow-x: auto; overflow-y: hidden; margin: 0 -20px; padding: 0 20px 20px;">
+                    <canvas id="grammar-chart" class="scrollable-chart" style="width: 100%; height: 250px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最近学习记录 -->
+        <div class="card">
+            <h3>最近学习记录</h3>
+            <div style="margin-top: 20px;">
+                {% if study_sessions %}
+                <div id="records-container" style="display: flex; flex-direction: column; gap: 12px; max-height: 200px; overflow-y: auto; transition: max-height 0.3s ease;">
+                    {% for session in study_sessions %}
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--light-blue); border-radius: 12px; border: 1px solid rgba(74, 144, 226, 0.2);">
+                        <div>
+                            <div style="font-weight: 500;">{{ session.subject }}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                                {{ session.start_time|date:"Y-m-d H:i" }}
+                            </div>
+                        </div>
+                        <div style="font-weight: bold; color: var(--mint);">
+                            {{ session.duration_minutes }}分钟
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div style="text-align: center; margin-top: 16px;">
+                    <button id="toggle-records" style="background: none; border: none; color: var(--mint); cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; transition: all 0.3s ease;">
+                        <i id="toggle-icon" data-lucide="chevron-down" size="18"></i>
+                        <span id="toggle-text">展开更多</span>
+                    </button>
+                </div>
+                {% else %}
+                <p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">
+                    暂无学习记录
+                </p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- 每日进度记录 -->
+        <div class="card">
+            <h3>每日进度记录</h3>
+            <div style="margin-top: 20px;">
+                {% if daily_progress_records %}
+                <div id="daily-progress-container" style="display: flex; flex-direction: column; gap: 12px; max-height: 200px; overflow-y: auto; transition: max-height 0.3s ease;">
+                    {% for progress in daily_progress_records %}
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--light-green); border-radius: 12px; border: 1px solid rgba(80, 227, 194, 0.2);">
+                        <div>
+                            <div style="font-weight: 500;">{{ progress.module.template.name }} - {{ progress.module.name }}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                                {{ progress.created_at|date:"Y-m-d H:i" }}
+                            </div>
+                        </div>
+                        <div style="font-weight: bold; color: var(--mint);">
+                            {{ progress.actual_value }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div style="text-align: center; margin-top: 16px;">
+                    <button id="toggle-daily-progress" style="background: none; border: none; color: var(--mint); cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; transition: all 0.3s ease;">
+                        <i id="toggle-daily-icon" data-lucide="chevron-down" size="18"></i>
+                        <span id="toggle-daily-text">展开更多</span>
+                    </button>
+                </div>
+                {% else %}
+                <p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">
+                    暂无进度记录
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+    <!-- 图表数据 -->
+    {{ completion_data|json_script:"completion_data" }}
+    {{ daily_data|json_script:"daily_data" }}
+    {{ grammar_data|json_script:"grammar_data" }}
+
+    <!-- 加载Chart.js库 -->
+    <script src="https://unpkg.com/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <script>
+        // 暗夜模式初始化
+        const root = document.documentElement;
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        
+        // 检查本地存储或系统偏好
+        const isDarkMode = localStorage.getItem('darkMode') === 'true' || 
+                         (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && 
+                          localStorage.getItem('darkMode') === null);
+        
+        // 设置初始模式
+        if (isDarkMode) {
+            root.classList.add('dark');
+        }
+        
+        // 切换按钮点击事件
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', function() {
+                root.classList.toggle('dark');
+                
+                // 保存设置到本地存储
+                const isDark = root.classList.contains('dark');
+                localStorage.setItem('darkMode', isDark);
+                
+                // 更新图标
+                updateDarkModeIcon();
+            });
+            
+            // 更新图标函数
+            function updateDarkModeIcon() {
+                const icon = darkModeToggle.querySelector('i');
+                if (icon) {
+                    if (root.classList.contains('dark')) {
+                        icon.setAttribute('data-lucide', 'moon');
+                    } else {
+                        icon.setAttribute('data-lucide', 'sun');
+                    }
+                    // 重新渲染图标
+                    lucide.createIcons();
+                }
+            }
+            
+            // 初始更新图标
+            updateDarkModeIcon();
+        }
+
+        // 页面加载完成后初始化图表和功能
+        window.onload = function() {
+            console.log('页面加载完成，开始初始化图表');
+            
+            // 获取当前模式
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            // 设置图表主题
+            const chartTheme = isDark ? {
+                backgroundColor: 'rgba(0, 0, 0, 0)',
+                color: '#FFFFFF'
+            } : {
+                backgroundColor: 'rgba(0, 0, 0, 0)',
+                color: '#333333'
+            };
+            
+            try {
+                // 从HTML元素获取图表数据
+                const completionData = JSON.parse(document.getElementById('completion_data').textContent);
+                const dailyData = JSON.parse(document.getElementById('daily_data').textContent);
+                
+                // 1. 初始化模块完成率饼图
+                console.log('初始化饼图...');
+                const pieCtx = document.getElementById('completion-chart').getContext('2d');
+                new Chart(pieCtx, {
+                    type: 'pie',
+                    data: completionData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: {
+                                    color: chartTheme.color
+                                }
+                            },
+                            tooltip: {
+                                enabled: true,
+                                backgroundColor: isDark ? '#2D3748' : '#FFFFFF',
+                                titleColor: chartTheme.color,
+                                bodyColor: chartTheme.color,
+                                borderColor: isDark ? '#4A5568' : '#E1E8ED',
+                                borderWidth: 1
+                            }
+                        }
+                    }
+                });
+                console.log('饼图初始化成功');
+                
+                // 2. 初始化每日学习量折线图
+                console.log('初始化折线图...');
+                const lineCtx = document.getElementById('daily-chart').getContext('2d');
+                new Chart(lineCtx, {
+                    type: 'line',
+                    data: dailyData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '分钟',
+                                    color: chartTheme.color
+                                },
+                                grid: {
+                                    color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                                    tickColor: chartTheme.color
+                                },
+                                ticks: {
+                                    color: chartTheme.color
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: '星期',
+                                    color: chartTheme.color
+                                },
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: chartTheme.color
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    color: chartTheme.color
+                                }
+                            },
+                            tooltip: {
+                                enabled: true,
+                                backgroundColor: isDark ? '#2D3748' : '#FFFFFF',
+                                titleColor: chartTheme.color,
+                                bodyColor: chartTheme.color,
+                                borderColor: isDark ? '#4A5568' : '#E1E8ED',
+                                borderWidth: 1
+                            }
+                        }
+                    }
+                });
+                console.log('折线图初始化成功');
+                
+                // 3. 初始化语法知识点条形图（使用后端传递的真实数据）
+                console.log('初始化条形图...');
+                const barCtx = document.getElementById('grammar-chart').getContext('2d');
+                
+                // 使用后端传递的grammar_data
+                const grammarData = JSON.parse(document.getElementById('grammar_data').textContent);
+                
+                // 如果没有数据，使用默认值
+                const chartData = grammarData.labels && grammarData.labels.length > 0 ? grammarData : {
+                    labels: ['暂无数据'],
+                    datasets: [{
+                        label: '掌握程度（%）',
+                        data: [0],
+                        backgroundColor: isDark ? '#6366f1' : '#64B5F6',
+                        borderWidth: 0
+                    }]
+                };
+                
+                new Chart(barCtx, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        // 配置图表以支持横向滚动
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: '百分比',
+                                    color: chartTheme.color
+                                },
+                                grid: {
+                                    color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+                                },
+                                ticks: {
+                                    color: chartTheme.color
+                                },
+                                // 确保y轴固定
+                                position: 'left',
+                                min: 0,
+                                max: 100
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: '模块',
+                                    color: chartTheme.color
+                                },
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: chartTheme.color,
+                                    // 当模块名称过长时，旋转显示
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                },
+                                // 确保x轴可以滚动
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    color: chartTheme.color
+                                }
+                            },
+                            tooltip: {
+                                enabled: true,
+                                backgroundColor: isDark ? '#2D3748' : '#FFFFFF',
+                                titleColor: chartTheme.color,
+                                bodyColor: chartTheme.color,
+                                borderColor: isDark ? '#4A5568' : '#E1E8ED',
+                                borderWidth: 1
+                            }
+                        },
+                        // 配置图表布局
+                        layout: {
+                            padding: {
+                                left: 20,
+                                right: 20
+                            }
+                        }
+                    }
+                });
+                console.log('条形图初始化成功');
+                
+            } catch (error) {
+                console.error('图表初始化失败:', error);
+                // 在页面上显示错误信息，便于用户了解情况
+                const chartContainer = document.querySelector('.charts-grid');
+                chartContainer.innerHTML = `
+                    <div style="text-align: center; color: #E57373; padding: 40px;">
+                        <h3>图表加载失败</h3>
+                        <p>请检查浏览器控制台以获取详细错误信息</p>
+                        <p style="font-size: 12px; margin-top: 20px;">建议：禁用浏览器扩展或在隐身模式下测试</p>
+                    </div>
+                `;
+            }
+            
+            // 初始化学习记录折叠/展开功能
+            const toggleButton = document.getElementById('toggle-records');
+            const recordsContainer = document.getElementById('records-container');
+            const toggleIcon = document.getElementById('toggle-icon');
+            const toggleText = document.getElementById('toggle-text');
+            
+            if (toggleButton && recordsContainer && toggleIcon && toggleText) {
+                let isExpanded = false;
+                
+                toggleButton.addEventListener('click', function() {
+                    isExpanded = !isExpanded;
+                    
+                    if (isExpanded) {
+                        recordsContainer.style.maxHeight = '500px'; // 展开状态，最大高度500px
+                        toggleIcon.setAttribute('data-lucide', 'chevron-up');
+                        toggleText.textContent = '收起';
+                    } else {
+                        recordsContainer.style.maxHeight = '200px'; // 折叠状态，最大高度200px
+                        toggleIcon.setAttribute('data-lucide', 'chevron-down');
+                        toggleText.textContent = '展开更多';
+                    }
+                    
+                    // 重新渲染图标
+                    lucide.createIcons();
+                });
+            }
+            
+            // 初始化每日进度记录折叠/展开功能
+            const toggleDailyButton = document.getElementById('toggle-daily-progress');
+            const dailyProgressContainer = document.getElementById('daily-progress-container');
+            const toggleDailyIcon = document.getElementById('toggle-daily-icon');
+            const toggleDailyText = document.getElementById('toggle-daily-text');
+            
+            if (toggleDailyButton && dailyProgressContainer && toggleDailyIcon && toggleDailyText) {
+                let isDailyExpanded = false;
+                
+                toggleDailyButton.addEventListener('click', function() {
+                    isDailyExpanded = !isDailyExpanded;
+                    
+                    if (isDailyExpanded) {
+                        dailyProgressContainer.style.maxHeight = '500px'; // 展开状态，最大高度500px
+                        toggleDailyIcon.setAttribute('data-lucide', 'chevron-up');
+                        toggleDailyText.textContent = '收起';
+                    } else {
+                        dailyProgressContainer.style.maxHeight = '200px'; // 折叠状态，最大高度200px
+                        toggleDailyIcon.setAttribute('data-lucide', 'chevron-down');
+                        toggleDailyText.textContent = '展开更多';
+                    }
+                    
+                    // 重新渲染图标
+                    lucide.createIcons();
+                });
+            }
+        };
+    </script>
+</body>
+</html>

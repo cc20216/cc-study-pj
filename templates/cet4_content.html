@@ -1,0 +1,315 @@
+<!-- CET-4学科特定内容 -->
+{% if current_module.name == '词汇' %}
+    <!-- 词汇功能区 -->
+    <div style="margin-bottom: 20px;">
+        <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">词汇学习功能</h4>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
+            <button id="random-check-btn" class="btn btn-primary">
+                <i data-lucide="shuffle" size="16"></i>
+                随机抽查
+            </button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="text" id="word-search" placeholder="搜索单词..." 
+                       style="padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; flex: 1; min-width: 200px;">
+                <button id="search-btn" class="btn btn-secondary">
+                    <i data-lucide="search" size="16"></i>
+                    搜索
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 随机抽查区域 -->
+    <div id="random-check-area" style="margin-bottom: 20px; padding: 20px; background: #F7FAFC; border-radius: 12px; display: none;">
+        <h5 style="margin: 0 0 15px 0; color: var(--text-primary);">随机抽查</h5>
+        <div id="random-word" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; color: var(--text-primary);">--</div>
+        <div id="random-word-meaning" style="margin-bottom: 15px; color: var(--text-secondary);">点击"随机抽查"开始</div>
+        <div style="display: flex; gap: 12px;">
+            <button id="show-meaning-btn" class="btn btn-secondary">显示释义</button>
+            <button id="next-word-btn" class="btn btn-primary">下一个</button>
+            <button id="known-btn" class="btn btn-secondary">已掌握</button>
+        </div>
+    </div>
+
+    <!-- 搜索结果区域 -->
+    <div id="search-result" style="margin-bottom: 20px; display: none;">
+        <h5 style="margin: 0 0 15px 0; color: var(--text-primary);">搜索结果</h5>
+        <div id="search-result-content"></div>
+    </div>
+
+    <!-- 高频词汇列表 -->
+    <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">CET-4高频词汇</h4>
+    <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+        <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+            <li>abandon - vt. 放弃；抛弃</li>
+            <li>ability - n. 能力；才能</li>
+            <li>able - adj. 能够的；有能力的</li>
+            <li>abnormal - adj. 不正常的；反常的</li>
+            <li>aboard - adv./prep. 在船(车)上；上船</li>
+            <li>about - prep. 关于；大约</li>
+            <li>above - prep. 在...上面；超过</li>
+            <li>abroad - adv. 在国外；到国外</li>
+            <li>absence - n. 缺席；缺乏</li>
+            <li>absolute - adj. 绝对的；完全的</li>
+            <li>absorb - vt. 吸收；吸引</li>
+            <li>abstract - adj. 抽象的 n. 摘要</li>
+            <li>abundant - adj. 丰富的；充裕的</li>
+            <li>abuse - vt./n. 滥用；虐待</li>
+            <li>academic - adj. 学术的；学院的</li>
+            <li>accelerate - vt. 加速；促进</li>
+            <li>accent - n. 口音；重音</li>
+            <li>accept - vt. 接受；认可</li>
+            <li>access - n. 通道；接近 vt. 接近</li>
+            <li>accident - n. 事故；意外</li>
+            <li>accommodate - vt. 容纳；提供住宿</li>
+            <li>accompany - vt. 陪伴；伴随</li>
+            <li>accomplish - vt. 完成；实现</li>
+            <li>accord - n. 一致；协议 vt. 给予</li>
+            <li>account - n. 账户；描述 vi. 说明</li>
+            <li>accumulate - vt./vi. 积累；积聚</li>
+            <li>accuracy - n. 准确性；精确性</li>
+            <li>accurate - adj. 准确的；精确的</li>
+            <li>accuse - vt. 指责；控告</li>
+            <li>achieve - vt. 实现；达到</li>
+            <li>achievement - n. 成就；完成</li>
+            <li>acid - adj. 酸的 n. 酸</li>
+            <li>acknowledge - vt. 承认；感谢</li>
+            <li>acquire - vt. 获得；学到</li>
+            <li>acquisition - n. 获得；习得</li>
+            <li>across - prep. 穿过；在...对面</li>
+            <li>act - vi. 行动；表演 vt. 扮演 n. 行为</li>
+            <li>action - n. 行动；活动</li>
+            <li>active - adj. 活跃的；积极的</li>
+            <li>activity - n. 活动；活跃</li>
+            <li>actor - n. 男演员</li>
+            <li>actress - n. 女演员</li>
+            <li>actual - adj. 实际的；真实的</li>
+            <li>actually - adv. 实际上；事实上</li>
+            <li>acute - adj. 严重的；敏锐的</li>
+            <li>adapt - vt. 使适应；改编 vi. 适应</li>
+            <li>add - vt./vi. 添加；增加</li>
+            <li>addition - n. 加法；增加</li>
+            <li>additional - adj. 额外的；附加的</li>
+            <li>address - n. 地址；演讲 vt. 演说；处理</li>
+            <li>adequate - adj. 足够的；适当的</li>
+            <li>adjust - vt./vi. 调整；适应</li>
+            <li>administration - n. 管理；行政</li>
+            <li>admire - vt. 钦佩；赞美</li>
+            <li>admit - vt. 承认；准许进入</li>
+            <li>adopt - vt. 采用；收养</li>
+            <li>adult - adj. 成年的 n. 成年人</li>
+            <li>advance - vi. 前进；进展 n. 前进；预付款</li>
+            <li>advanced - adj. 先进的；高级的</li>
+            <li>advantage - n. 优势；有利条件</li>
+            <li>adventure - n. 冒险；奇遇</li>
+            <li>adverb - n. 副词</li>
+            <li>advertise - vt./vi. 做广告</li>
+            <li>advertisement - n. 广告</li>
+            <li>advice - n. 建议；忠告</li>
+            <li>advise - vt./vi. 建议；劝告</li>
+            <li>advocate - vt. 提倡；主张 n. 倡导者</li>
+            <li>aeroplane - n. 飞机</li>
+            <li>affair - n. 事情；事件</li>
+            <li>affect - vt. 影响；感动</li>
+            <li>affection - n. 爱；感情</li>
+            <li>afford - vt. 买得起；承担得起</li>
+            <li>afraid - adj. 害怕的；担心的</li>
+            <li>after - prep. 在...之后 conj. 在...之后 adv. 之后</li>
+            <li>afternoon - n. 下午</li>
+            <li>afterward(s) - adv. 后来；以后</li>
+            <li>again - adv. 再；又</li>
+            <li>against - prep. 反对；靠着</li>
+            <li>age - n. 年龄；时代 vi. 变老</li>
+            <li>agency - n. 代理；机构</li>
+            <li>agent - n. 代理人；经纪人</li>
+            <li>ago - adv. 以前</li>
+            <li>agree - vi. 同意；赞成 vt. 同意</li>
+            <li>agreement - n. 同意；协议</li>
+            <li>agriculture - n. 农业；农学</li>
+            <li>ahead - adv. 向前；提前</li>
+            <li>aid - n. 援助；帮助 vt. 帮助</li>
+            <li>aim - vi. 瞄准；旨在 vt. 瞄准 n. 目标</li>
+            <li>air - n. 空气；天空 vt. 晾干；通风</li>
+            <li>aircraft - n. 飞机；航空器</li>
+            <li>airline - n. 航空公司；航线</li>
+            <li>airport - n. 机场；航空站</li>
+            <li>alarm - n. 警报；惊恐 vt. 使惊恐</li>
+            <li>alcohol - n. 酒精；乙醇</li>
+            <li>alert - adj. 警觉的；警惕的 vt. 使警觉</li>
+            <li>alike - adj. 相似的 adv. 一样地</li>
+            <li>alive - adj. 活着的；活跃的</li>
+            <li>all - adj. 所有的 pron. 全部 adv. 完全</li>
+            <li>allocate - vt. 分配；分派</li>
+            <li>allow - vt. 允许；准许</li>
+            <li>ally - n. 盟友；同盟国 vt. 使结盟</li>
+            <li>almost - adv. 几乎；差不多</li>
+            <li>alone - adj. 单独的 adv. 独自地</li>
+            <li>along - prep. 沿着 adv. 向前</li>
+            <li>aloud - adv. 大声地；出声地</li>
+            <li>alphabet - n. 字母表</li>
+            <li>already - adv. 已经；早已</li>
+            <li>also - adv. 也；同样</li>
+            <li>alter - vt./vi. 改变；修改</li>
+            <li>alternative - adj. 替代的 n. 替代品</li>
+            <li>although - conj. 尽管；虽然</li>
+            <li>altogether - adv. 完全；总共</li>
+            <li>always - adv. 总是；一直</li>
+            <li>amateur - adj. 业余的 n. 业余爱好者</li>
+            <li>amaze - vt. 使惊讶；使惊愕</li>
+            <li>ambassador - n. 大使；使节</li>
+            <li>ambiguous - adj. 模糊的；模棱两可的</li>
+            <li>ambition - n. 野心；抱负</li>
+            <li>ambitious - adj. 有野心的；有抱负的</li>
+            <li>ambulance - n. 救护车</li>
+            <li>America - n. 美洲；美国</li>
+            <li>American - adj. 美洲的；美国的 n. 美国人</li>
+            <li>among - prep. 在...之中</li>
+            <li>amount - n. 数量；总额 vi. 总计</li>
+            <li>ample - adj. 充足的；丰富的</li>
+            <li>amplify - vt. 放大；增强</li>
+            <li>amuse - vt. 逗乐；使发笑</li>
+            <li>analyze - vt. 分析；分解</li>
+            <li>analysis - n. 分析；分解</li>
+            <li>ancestor - n. 祖先；先驱</li>
+            <li>anchor - n. 锚 vt. 抛锚；固定</li>
+            <li>ancient - adj. 古代的；古老的</li>
+            <li>and - conj. 和；与</li>
+            <li>anger - n. 愤怒 vt. 使愤怒</li>
+            <li>angle - n. 角度；观点</li>
+            <li>angry - adj. 生气的；愤怒的</li>
+            <li>animal - n. 动物</li>
+            <li>ankle - n. 脚踝</li>
+            <li>announce - vt. 宣布；宣告</li>
+            <li>announcement - n. 宣布；通告</li>
+            <li>annual - adj. 每年的；年度的 n. 年刊</li>
+            <li>another - adj. 另一个的 pron. 另一个</li>
+            <li>answer - n. 答案；回答 vt./vi. 回答</li>
+            <li>anticipate - vt. 预期；期望</li>
+            <li>anxiety - n. 焦虑；忧虑</li>
+            <li>anxious - adj. 焦虑的；渴望的</li>
+            <li>any - adj. 任何的 pron. 任何 adv. 稍微</li>
+            <li>anybody - pron. 任何人</li>
+            <li>anyhow - adv. 无论如何；不管怎样</li>
+            <li>anyone - pron. 任何人</li>
+            <li>anything - pron. 任何事</li>
+            <li>anyway - adv. 无论如何；不管怎样</li>
+            <li>anywhere - adv. 任何地方</li>
+            <li>apart - adv. 分开；分离</li>
+            <li>apartment - n. 公寓；套间</li>
+            <li>apologize - vi. 道歉；认错</li>
+            <li>apology - n. 道歉；认错</li>
+            <li>apparent - adj. 明显的；表面的</li>
+            <li>apparently - adv. 显然；表面上</li>
+            <li>appeal - vi. 呼吁；吸引；上诉 n. 呼吁；吸引力</li>
+            <li>appear - vi. 出现；似乎</li>
+            <li>appearance - n. 外观；出现</li>
+            <li>apple - n. 苹果</li>
+            <li>application - n. 应用；申请；应用程序</li>
+            <li>apply - vt. 应用；申请 vi. 申请；适用</li>
+            <li>appoint - vt. 任命；约定</li>
+            <li>appointment - n. 任命；约会</li>
+            <li>appreciate - vt. 欣赏；感激；理解</li>
+            <li>approach - vt. 接近；靠近 n. 方法；途径</li>
+            <li>appropriate - adj. 适当的；合适的 vt. 占用；拨款</li>
+            <li>approval - n. 批准；认可</li>
+            <li>approve - vt. 批准；赞成 vi. 赞成</li>
+            <li>approximate - adj. 近似的；大约的 vt./vi. 接近</li>
+            <li>approximately - adv. 大约；近似地</li>
+            <li>apartment - n. 公寓；套间</li>
+            <li>apologize - vi. 道歉；认错</li>
+            <li>apology - n. 道歉；认错</li>
+            <li>apparent - adj. 明显的；表面的</li>
+            <li>apparently - adv. 显然；表面上</li>
+            <li>appeal - vi. 呼吁；吸引；上诉 n. 呼吁；吸引力</li>
+            <li>appear - vi. 出现；似乎</li>
+            <li>appearance - n. 外观；出现</li>
+            <li>apple - n. 苹果</li>
+            <li>application - n. 应用；申请；应用程序</li>
+            <li>apply - vt. 应用；申请 vi. 申请；适用</li>
+            <li>appoint - vt. 任命；约定</li>
+            <li>appointment - n. 任命；约会</li>
+            <li>appreciate - vt. 欣赏；感激；理解</li>
+            <li>approach - vt. 接近；靠近 n. 方法；途径</li>
+            <li>appropriate - adj. 适当的；合适的 vt. 占用；拨款</li>
+            <li>approval - n. 批准；认可</li>
+            <li>approve - vt. 批准；赞成 vi. 赞成</li>
+            <li>approximate - adj. 近似的；大约的 vt./vi. 接近</li>
+            <li>approximately - adv. 大约；近似地</li>
+        </ul>
+    </div>
+    <p style="margin: 15px 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+        以上为CET-4高频词汇示例，建议每天背诵100个，坚持积累。
+    </p>
+{% elif current_module.name == '语法' %}
+    <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">虚拟语气</h4>
+    <p style="margin: 0 0 15px; color: var(--text-primary);">
+        虚拟语气是英语四级考试中的重要语法点，主要用于表达假设、愿望、建议等非真实情况。
+    </p>
+    <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">基本结构：</h5>
+    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+        <li>与现在事实相反：if + 过去式，would + 动词原形</li>
+        <li>与过去事实相反：if + had + 过去分词，would + have + 过去分词</li>
+        <li>与将来事实相反：if + 过去式/were to do/should do，would + 动词原形</li>
+    </ul>
+    <p style="margin: 15px 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+        建议每天练习20道虚拟语气相关题目，熟悉各种时态的用法。
+    </p>
+{% elif current_module.name == '听力' %}
+    <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">听力技巧</h4>
+    <p style="margin: 0 0 15px; color: var(--text-primary);">
+        英语四级听力考试包括短对话、长对话和听力篇章三部分，总分为248.5分。
+    </p>
+    <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">备考建议：</h5>
+    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+        <li>每天坚持听30分钟英语材料</li>
+        <li>练习速记关键词汇和数字</li>
+        <li>熟悉听力考试题型和出题规律</li>
+        <li>模拟真实考试环境进行练习</li>
+    </ul>
+{% elif current_module.name == '阅读' %}
+    <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">阅读技巧</h4>
+    <p style="margin: 0 0 15px; color: var(--text-primary);">
+        英语四级阅读考试包括选词填空、长篇阅读和仔细阅读三部分，总分为248.5分。
+    </p>
+    <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">备考建议：</h5>
+    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+        <li>提高阅读速度，每天阅读至少4篇文章</li>
+        <li>掌握各种题型的解题方法</li>
+        <li>积累高频词汇和短语</li>
+        <li>学会快速定位关键信息</li>
+    </ul>
+{% elif current_module.name == '写作' %}
+    <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">写作模板</h4>
+    <p style="margin: 0 0 15px; color: var(--text-primary);">
+        英语四级写作考试要求考生根据提示写出一篇不少于120词的短文，总分为106.5分。
+    </p>
+    <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">开头模板：</h5>
+    <p style="margin: 0 0 15px; padding: 10px; background: #F7FAFC; border-radius: 8px; color: var(--text-primary);">
+        With the rapid development of society, more and more people are paying attention to...
+    </p>
+    <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">结尾模板：</h5>
+    <p style="margin: 0; padding: 10px; background: #F7FAFC; border-radius: 8px; color: var(--text-primary);">
+        In conclusion, I believe that... Therefore, it is time for us to take actions to...
+    </p>
+{% elif current_module.name == '翻译' %}
+    <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">翻译技巧</h4>
+    <p style="margin: 0 0 15px; color: var(--text-primary);">
+        英语四级翻译考试要求考生将一段中文翻译成英文，总分为106.5分。
+    </p>
+    <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">备考建议：</h5>
+    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+        <li>积累常用词汇和短语</li>
+        <li>掌握各种句型的翻译方法</li>
+        <li>注意时态和语态的正确使用</li>
+        <li>每天练习翻译1-2篇短文</li>
+    </ul>
+    <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">示例：</h5>
+    <p style="margin: 0; padding: 10px; background: #F7FAFC; border-radius: 8px; color: var(--text-primary);">
+        原文：中国是世界上人口最多的国家。<br>
+        译文：China is the most populous country in the world.
+    </p>
+{% else %}
+    <p style="color: var(--text-secondary);">
+        该模块的推荐学习内容正在整理中，敬请期待...
+    </p>
+{% endif %}

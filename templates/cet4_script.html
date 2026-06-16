@@ -1,0 +1,123 @@
+// 词汇数据 - 从页面中提取
+const getVocabularyData = () => {
+    const vocabList = [];
+    const listItems = document.querySelectorAll('.study-content ul li');
+    listItems.forEach(item => {
+        const text = item.textContent.trim();
+        const match = text.match(/^(\w+)\s*-\s*(.+)$/);
+        if (match) {
+            vocabList.push({
+                word: match[1],
+                meaning: match[2]
+            });
+        }
+    });
+    return vocabList;
+};
+
+const vocabData = getVocabularyData();
+let currentWordIndex = -1;
+let showingMeaning = false;
+
+// 随机抽查功能
+const randomCheckBtn = document.getElementById('random-check-btn');
+const randomCheckArea = document.getElementById('random-check-area');
+const randomWord = document.getElementById('random-word');
+const randomWordMeaning = document.getElementById('random-word-meaning');
+const showMeaningBtn = document.getElementById('show-meaning-btn');
+const nextWordBtn = document.getElementById('next-word-btn');
+const knownBtn = document.getElementById('known-btn');
+
+if (randomCheckBtn) {
+    randomCheckBtn.addEventListener('click', () => {
+        randomCheckArea.style.display = 'block';
+        showNextRandomWord();
+    });
+}
+
+const showNextRandomWord = () => {
+    currentWordIndex = Math.floor(Math.random() * vocabData.length);
+    randomWord.textContent = vocabData[currentWordIndex].word;
+    randomWordMeaning.textContent = '点击"显示释义"查看释义';
+    showingMeaning = false;
+    showMeaningBtn.style.display = 'inline-block';
+};
+
+if (showMeaningBtn) {
+    showMeaningBtn.addEventListener('click', () => {
+        if (!showingMeaning) {
+            randomWordMeaning.textContent = vocabData[currentWordIndex].meaning;
+            showingMeaning = true;
+        }
+    });
+}
+
+if (nextWordBtn) {
+    nextWordBtn.addEventListener('click', () => {
+        showNextRandomWord();
+    });
+}
+
+if (knownBtn) {
+    knownBtn.addEventListener('click', () => {
+        // 这里可以添加已掌握单词的处理逻辑
+        alert('已标记为掌握！');
+        showNextRandomWord();
+    });
+}
+
+// 单词搜索功能
+const searchBtn = document.getElementById('search-btn');
+const wordSearch = document.getElementById('word-search');
+const searchResult = document.getElementById('search-result');
+const searchResultContent = document.getElementById('search-result-content');
+
+const searchWord = () => {
+    const query = wordSearch.value.trim().toLowerCase();
+    if (!query) {
+        searchResult.style.display = 'none';
+        return;
+    }
+
+    const results = vocabData.filter(vocab => 
+        vocab.word.toLowerCase().includes(query) || 
+        vocab.meaning.toLowerCase().includes(query)
+    );
+
+    if (results.length > 0) {
+        searchResultContent.innerHTML = `
+            <div style="max-height: 300px; overflow-y: auto;">
+                <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+                    ${results.map(result => `
+                        <li style="margin-bottom: 8px; padding: 8px 0; border-bottom: 1px solid var(--border);">
+                            <strong>${result.word}</strong> - ${result.meaning}
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+            <p style="margin: 15px 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+                找到 ${results.length} 个相关单词
+            </p>
+        `;
+        searchResult.style.display = 'block';
+    } else {
+        searchResultContent.innerHTML = `
+            <p style="color: var(--text-secondary);">
+                未找到匹配的单词
+            </p>
+        `;
+        searchResult.style.display = 'block';
+    }
+};
+
+if (searchBtn) {
+    searchBtn.addEventListener('click', searchWord);
+}
+
+if (wordSearch) {
+    wordSearch.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            searchWord();
+        }
+    });
+}

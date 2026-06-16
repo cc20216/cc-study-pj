@@ -1,0 +1,18 @@
+# Project Environment Requirements
+# Python Version: 3.7.9
+# Database: MySQL 5.7+/8.0
+# OS: Windows/macOS/Linux
+
+asgiref==3.7.2
+certifi==2025.11.12
+charset-normalizer==3.4.4
+Django==3.2.25
+idna==3.10
+Pillow==9.5.0
+PyMySQL==1.1.1
+python-dotenv==1.0.0
+pytz==2025.2
+requests==2.31.0
+sqlparse==0.4.4
+typing_extensions==4.7.1
+urllib3==2.0.7

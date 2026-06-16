@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI问答 - StudyFlow</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 基础样式 */
+        :root {
+            --bg-main: #F8FAFB;
+            --card-bg: #FFFFFF;
+            --mint: #81C784;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --border: #EDF2F7;
+            --purple: #6366f1;
+        }
+
+        /* 暗夜模式变量 */
+        :root.dark {
+            --bg-main: #1A202C;
+            --card-bg: #2D3748;
+            --mint: #81C784;
+            --text-primary: #F7FAFC;
+            --text-secondary: #A0AEC0;
+            --border: #4A5568;
+            --purple: #6366f1;
+        }
+
+        /* 确保聊天容器在暗夜模式下清晰可见 */
+        :root.dark .chat-main {
+            background: var(--card-bg);
+        }
+
+        /* 确保聊天消息在暗夜模式下清晰可见 */
+        :root.dark .message.user .message-content {
+            background: var(--purple);
+            color: white;
+        }
+
+        :root.dark .message.assistant .message-content {
+            background: #4A5568;
+            color: var(--text-primary);
+        }
+
+        /* 确保输入区域在暗夜模式下清晰可见 */
+        :root.dark .chat-input-area {
+            background: #4A5568;
+        }
+
+        :root.dark .chat-input {
+            background: #2D3748;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        /* 确保聊天标题栏在暗夜模式下清晰可见 */
+        :root.dark .chat-header {
+            background: var(--card-bg) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* 确保所有元素在暗夜模式下正确显示 */
+        :root.dark {
+            /* 强制所有文本元素使用浅色文字 */
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            p,
+            span,
+            div,
+            select,
+            option,
+            li,
+            i,
+            label {
+                color: white !important;
+            }
+
+            /* 确保所有卡片和容器使用深色背景，白色边框和适当模糊效果 */
+            .chat-main,
+            .chat-input-area,
+            .chat-list,
+            .chat-item,
+            .chat-items,
+            .empty-state,
+            .rename-dialog-content,
+            div[style*="background: white"],
+            div[style*="background-color: white"],
+            div[style*="background: #FFF"],
+            div[style*="background: #ffffff"],
+            div[style*="background: #F7FAFC"],
+            label[style*="background: white"],
+            label[style*="background-color: white"],
+            label[style*="background: #FFF"],
+            label[style*="background: #ffffff"] {
+                background-color: var(--card-bg) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+            }
+
+            /* 确保按钮在暗夜模式下清晰可见 */
+            .btn-purple {
+                background: var(--purple) !important;
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+
+            .btn-secondary {
+                background: #4A5568 !important;
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+
+            /* 确保退出登录按钮在暗夜模式下清晰可见 */
+            :root.dark a[href="{% url 'logout' %}"] {
+                background: #4A5568 !important;
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+
+            /* 确保导航链接在暗夜模式下清晰可见 */
+            :root.dark a[href="{% url 'home' %}"] {
+                color: white !important;
+            }
+        }
+
+
+
+        body {
+            margin: 0;
+            font-family: -apple-system, "Noto Sans SC", sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        nav {
+            height: 64px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* AI聊天页面样式 */
+    .chat-container {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 20px;
+        height: calc(100vh - 120px);
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* 左侧对话列表 */
+    .chat-list {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-list h3 {
+        margin: 0 0 20px 0;
+        color: #333;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .chat-list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .create-chat-btn {
+        background: #6366f1;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.2s;
+    }
+
+    .create-chat-btn:hover {
+        background: #4f46e5;
+    }
+
+    .chat-items {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 20px;
+    }
+
+    .chat-item {
+        padding: 12px 16px;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: white;
+        border: 1px solid #e0e0e0;
+        position: relative;
+    }
+
+    .chat-item:hover {
+        background: #eef2ff;
+        border-color: #6366f1;
+    }
+
+    .chat-item.active {
+        background: #6366f1;
+        color: white;
+        border-color: #6366f1;
+    }
+
+    .chat-item-name {
+        font-weight: 500;
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+
+    .chat-item-summary {
+        font-size: 12px;
+        opacity: 0.8;
+        margin: 4px 0;
+        color: #666;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .chat-item.active .chat-item-summary {
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .chat-item-time {
+        font-size: 12px;
+        opacity: 0.7;
+    }
+
+    .chat-item-actions {
+        display: none;
+        position: absolute;
+        right: 8px;
+        top: 8px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 4px;
+        padding: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .chat-item:hover .chat-item-actions {
+        display: flex;
+        gap: 4px;
+    }
+
+    .chat-item-actions button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        transition: background 0.2s;
+    }
+
+    .chat-item-actions button:hover {
+        background: #f0f0f0;
+    }
+
+    /* 右侧聊天区域 */
+    .chat-main {
+        display: flex;
+        flex-direction: column;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        min-height: calc(100vh - 160px);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .chat-header {
+        padding: 20px;
+        border-bottom: 1px solid #e0e0e0;
+        background: #f8f9fa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chat-header h2 {
+        margin: 0;
+        font-size: 20px;
+        color: #333;
+    }
+
+    .chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* 确保空状态也占满宽度 */
+    .empty-state {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* 消息样式 */
+    .message {
+        display: flex;
+        gap: 12px;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .message.user {
+        justify-content: flex-end;
+    }
+
+    .message.assistant {
+        justify-content: flex-start;
+    }
+
+    .message-content {
+        max-width: 70%;
+        padding: 12px 16px;
+        border-radius: 18px;
+        line-height: 1.5;
+    }
+
+    .message.user .message-content {
+        background: #6366f1;
+        color: white;
+        border-bottom-right-radius: 6px;
+    }
+
+    .message.assistant .message-content {
+        background: #f1f5f9;
+        color: #333;
+        border-bottom-left-radius: 6px;
+    }
+
+    .message-role {
+        font-size: 12px;
+        opacity: 0.7;
+        margin-bottom: 4px;
+    }
+
+    .message-time {
+        font-size: 11px;
+        opacity: 0.6;
+        margin-top: 4px;
+        text-align: right;
+    }
+
+    /* 输入区域 */
+    .chat-input-area {
+        padding: 20px;
+        border-top: 1px solid #e0e0e0;
+        background: #f8f9fa;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .chat-input-form {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .chat-input {
+        flex: 1;
+        min-height: 48px;
+        max-height: 120px;
+        padding: 12px 16px;
+        border: 1px solid #e0e0e0;
+        border-radius: 24px;
+        resize: none;
+        font-size: 14px;
+        line-height: 1.4;
+        font-family: inherit;
+        transition: border-color 0.2s;
+        width: 0;
+    }
+
+    .chat-input {
+        flex: 1;
+        min-height: 48px;
+        max-height: 120px;
+        padding: 12px 16px;
+        border: 1px solid #e0e0e0;
+        border-radius: 24px;
+        resize: none;
+        font-size: 14px;
+        line-height: 1.4;
+        font-family: inherit;
+        transition: border-color 0.2s;
+    }
+
+    .chat-input:focus {
+        outline: none;
+        border-color: #6366f1;
+    }
+
+    .send-btn {
+        background: #6366f1;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 24px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background 0.2s;
+        align-self: flex-end;
+    }
+
+    .send-btn:hover {
+        background: #4f46e5;
+    }
+
+    .send-btn:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+    }
+
+    /* 重命名对话框 */
+    .rename-dialog {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .rename-dialog-content {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        min-width: 300px;
+    }
+
+    .rename-dialog h3 {
+        margin: 0 0 16px 0;
+        font-size: 18px;
+        color: #333;
+    }
+
+    .rename-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+        margin-bottom: 16px;
+    }
+
+    .rename-input:focus {
+        outline: none;
+        border-color: #6366f1;
+    }
+
+    .rename-dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background: #6366f1;
+        color: white;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: #4f46e5;
+    }
+
+    .btn-secondary {
+        background: white;
+        color: #333;
+        border: 1px solid #e0e0e0;
+    }
+
+    .btn-secondary:hover {
+        background: #f8f9fa;
+    }
+
+    /* 加载动画 */
+    .loading {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .loading-dots {
+        display: flex;
+        gap: 4px;
+    }
+
+    .loading-dot {
+        width: 6px;
+        height: 6px;
+        background: #6b7280;
+        border-radius: 50%;
+        animation: loading 1.4s infinite ease-in-out;
+    }
+
+    .loading-dot:nth-child(1) {
+        animation-delay: -0.32s;
+    }
+
+    .loading-dot:nth-child(2) {
+        animation-delay: -0.16s;
+    }
+
+    @keyframes loading {
+        0%, 80%, 100% {
+            transform: scale(0);
+        }
+        40% {
+            transform: scale(1);
+        }
+    }
+
+    /* 空状态 */
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #6b7280;
+        text-align: center;
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    .empty-state h3 {
+        margin: 0 0 8px 0;
+        font-size: 18px;
+        color: #333;
+    }
+
+    .empty-state p {
+        margin: 0;
+        font-size: 14px;
+    }
+    </style>
+</head>
+<body>
+    <nav>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+                <div style="display: flex; align-items: center; gap: 10px; font-weight: bold; color: var(--mint); font-size: 1.2rem;">
+                    <i data-lucide="leaf"></i> StudyFlow
+                </div>
+            </a>
+            <button id="dark-mode-toggle" style="background: transparent; border: none; cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; color: var(--text-primary);">
+                <i data-lucide="moon" size="20"></i>
+            </button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: var(--text-primary);">首页</a>
+            <a href="{% url 'template_management' %}" class="btn btn-secondary">
+                <i data-lucide="clipboard-list" size="16"></i>
+                模板管理
+            </a>
+            <a href="{% url 'logout' %}" style="background: #E2E8F0; padding: 8px 16px; border-radius: 8px; text-decoration: none; color: var(--text-primary); font-size: 0.9rem;">退出登录</a>
+        </div>
+    </nav>
+
+    <div class="chat-container">
+    <!-- 左侧对话列表 -->
+    <div class="chat-list">
+        <div class="chat-list-header">
+            <h3>对话历史</h3>
+            <button class="create-chat-btn" onclick="createNewChat()">
+                <i data-lucide="plus"></i> 新对话
+            </button>
+        </div>
+        
+        <div class="chat-items" id="chatItems">
+            {% for chat in chat_histories %}
+            <div class="chat-item {% if chat.id == current_chat.id %}active{% endif %}" 
+                 data-chat-id="{{ chat.id }}" onclick="switchChat({{ chat.id }})">
+                <div class="chat-item-name">{{ chat.chat_name }}</div>
+                <div class="chat-item-summary">
+                    {% with latest_message=chat.messages.last %}
+                        {% if latest_message %}
+                            {% if latest_message.role == 'user' %}我：{% else %}AI：{% endif %}{{ latest_message.content|truncatechars:50 }}
+                        {% else %}
+                            新对话
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                <div class="chat-item-time">{{ chat.updated_at|date:'Y-m-d H:i' }}</div>
+                <div class="chat-item-actions">
+                    <button onclick="event.stopPropagation(); renameChat({{ chat.id }}, '{{ chat.chat_name }}')" 
+                            title="重命名">
+                        <i data-lucide="edit-2" size="14"></i>
+                    </button>
+                    <button onclick="event.stopPropagation(); deleteChat({{ chat.id }})" 
+                            title="删除">
+                        <i data-lucide="trash-2" size="14"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if not chat_histories %}
+        <div class="empty-state">
+            <i data-lucide="message-circle-question"></i>
+            <h3>暂无对话</h3>
+            <p>点击上方按钮开始新对话</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 右侧聊天区域 -->
+    <div class="chat-main">
+        <div class="chat-header">
+            <h2 id="currentChatName">
+                {% if current_chat %}{{ current_chat.chat_name }}{% else %}新对话{% endif %}
+            </h2>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            {% if current_messages %}
+                {% for message in current_messages %}
+                <div class="message {{ message.role }}">
+                    <div class="message-content">
+                        <div class="message-role">
+                            {% if message.role == 'user' %}我{% else %}AI助手{% endif %}
+                        </div>
+                        {{ message.content|linebreaksbr }}
+                        <div class="message-time">
+                            {{ message.created_at|date:'Y-m-d H:i' }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i data-lucide="message-circle"></i>
+                    <h3>开始对话</h3>
+                    <p>在下方输入框中输入您的问题</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="chat-input-area">
+            <form class="chat-input-form" onsubmit="sendMessage(event)">
+                <textarea 
+                    class="chat-input" 
+                    id="chatInput" 
+                    placeholder="输入您的问题..." 
+                    rows="1"
+                    required></textarea>
+                <button type="submit" class="send-btn" id="sendBtn">
+                    <i data-lucide="send"></i> 发送
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 重命名对话框 -->
+<div class="rename-dialog" id="renameDialog" style="display: none;">
+    <div class="rename-dialog-content">
+        <h3>重命名对话</h3>
+        <input type="text" class="rename-input" id="renameInput" placeholder="输入对话名称">
+        <div class="rename-dialog-actions">
+            <button class="btn btn-secondary" onclick="closeRenameDialog()">取消</button>
+            <button class="btn btn-primary" onclick="confirmRename()">确定</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 初始化Lucide图标
+        lucide.createIcons();
+        
+        // 暗夜模式初始化
+        const root = document.documentElement;
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        
+        // 检查本地存储或系统偏好
+        const isDarkMode = localStorage.getItem('darkMode') === 'true' || 
+                         (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && 
+                          localStorage.getItem('darkMode') === null);
+        
+        // 设置初始模式
+        if (isDarkMode) {
+            root.classList.add('dark');
+        }
+        
+        // 切换按钮点击事件
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', function() {
+                root.classList.toggle('dark');
+                
+                // 保存设置到本地存储
+                const isDark = root.classList.contains('dark');
+                localStorage.setItem('darkMode', isDark);
+                
+                // 更新图标
+                updateDarkModeIcon();
+            });
+            
+            // 更新图标函数
+            function updateDarkModeIcon() {
+                const icon = darkModeToggle.querySelector('i');
+                if (icon) {
+                    if (root.classList.contains('dark')) {
+                        icon.dataset.lucide = 'moon';
+                    } else {
+                        icon.dataset.lucide = 'sun';
+                    }
+                    // 重新渲染图标
+                    lucide.createIcons();
+                }
+            }
+            
+            // 初始更新图标
+            updateDarkModeIcon();
+        }
+        
+        // 当前对话ID
+        let currentChatId = {% if current_chat %}{{ current_chat.id }}{% else %}null{% endif %};
+    
+    // 滚动到最新消息
+    function scrollToBottom() {
+        const messagesContainer = document.getElementById('chatMessages');
+        if (messagesContainer) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    }
+    
+    // 页面加载时滚动到底部
+    window.addEventListener('load', scrollToBottom);
+    
+    // 创建新对话
+    function createNewChat() {
+        fetch('{% url 'create_chat' %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: new URLSearchParams({
+                'chat_name': '新对话'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = `{% url 'ai_chat' %}?chat_id=${data.chat_id}`;
+            }
+        })
+        .catch(error => console.error('创建对话失败:', error));
+    }
+    
+    // 切换对话
+    function switchChat(chatId) {
+        window.location.href = `{% url 'ai_chat' %}?chat_id=${chatId}`;
+    }
+    
+    // 发送消息
+    function sendMessage(event) {
+        event.preventDefault();
+        
+        const inputElement = document.getElementById('chatInput');
+        const message = inputElement.value.trim();
+        const sendBtn = document.getElementById('sendBtn');
+        
+        if (!message || !currentChatId) return;
+        
+        // 禁用发送按钮
+        sendBtn.disabled = true;
+        
+        // 显示用户消息
+        const messagesContainer = document.getElementById('chatMessages');
+        const userMessageDiv = document.createElement('div');
+        userMessageDiv.className = 'message user';
+        userMessageDiv.innerHTML = `
+            <div class="message-content">
+                <div class="message-role">我</div>
+                ${message.replace(/\n/g, '<br>')}
+                <div class="message-time">${new Date().toLocaleString('zh-CN')}</div>
+            </div>
+        `;
+        messagesContainer.appendChild(userMessageDiv);
+        
+        // 清空输入框
+        inputElement.value = '';
+        
+        // 滚动到底部
+        scrollToBottom();
+        
+        // 显示加载状态
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'message assistant';
+        loadingDiv.innerHTML = `
+            <div class="message-content">
+                <div class="message-role">AI助手</div>
+                <div class="loading">
+                    <span>思考中</span>
+                    <div class="loading-dots">
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        messagesContainer.appendChild(loadingDiv);
+        scrollToBottom();
+        
+        // 发送请求到后端
+        fetch('{% url 'send_message' %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                chat_id: currentChatId,
+                message: message
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // 移除加载状态
+            loadingDiv.remove();
+            
+            if (data.success) {
+                // 显示AI回复
+                const aiMessageDiv = document.createElement('div');
+                aiMessageDiv.className = 'message assistant';
+                aiMessageDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-role">AI助手</div>
+                        ${data.ai_response.content.replace(/\n/g, '<br>')}
+                        <div class="message-time">${data.ai_response.created_at}</div>
+                    </div>
+                `;
+                messagesContainer.appendChild(aiMessageDiv);
+                
+                // 更新对话列表
+                updateChatList();
+            } else {
+                // 显示错误消息
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'message assistant';
+                errorDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-role">AI助手</div>
+                        抱歉，生成回复失败，请稍后再试。
+                        <div class="message-time">${new Date().toLocaleString('zh-CN')}</div>
+                    </div>
+                `;
+                messagesContainer.appendChild(errorDiv);
+            }
+            
+            // 启用发送按钮
+            sendBtn.disabled = false;
+            
+            // 滚动到底部
+            scrollToBottom();
+        })
+        .catch(error => {
+            console.error('发送消息失败:', error);
+            // 移除加载状态
+            loadingDiv.remove();
+            // 启用发送按钮
+            sendBtn.disabled = false;
+        });
+    }
+    
+    // 更新对话列表
+    function updateChatList() {
+        fetch('{% url 'ai_chat' %}?chat_id=' + currentChatId, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            // 解析新的HTML并更新对话列表
+            const parser = new DOMParser();
+            const newDoc = parser.parseFromString(html, 'text/html');
+            const newChatItems = newDoc.getElementById('chatItems').innerHTML;
+            document.getElementById('chatItems').innerHTML = newChatItems;
+            // 重新初始化图标
+            lucide.createIcons();
+        })
+        .catch(error => console.error('更新对话列表失败:', error));
+    }
+    
+    // 重命名对话
+    function renameChat(chatId, currentName) {
+        const dialog = document.getElementById('renameDialog');
+        const input = document.getElementById('renameInput');
+        
+        input.value = currentName;
+        dialog.style.display = 'flex';
+        input.focus();
+        
+        // 保存当前聊天ID到全局变量
+        window.renameChatId = chatId;
+    }
+    
+    // 关闭重命名对话框
+    function closeRenameDialog() {
+        document.getElementById('renameDialog').style.display = 'none';
+        window.renameChatId = null;
+    }
+    
+    // 确认重命名
+    function confirmRename() {
+        const newName = document.getElementById('renameInput').value.trim();
+        const chatId = window.renameChatId;
+        
+        if (!newName || !chatId) return;
+        
+        fetch('{% url 'rename_chat' %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                chat_id: chatId,
+                new_name: newName
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 更新当前聊天名称
+                if (chatId == currentChatId) {
+                    document.getElementById('currentChatName').textContent = newName;
+                }
+                // 更新对话列表
+                updateChatList();
+            }
+            closeRenameDialog();
+        })
+        .catch(error => console.error('重命名对话失败:', error));
+    }
+    
+    // 删除对话
+    function deleteChat(chatId) {
+        if (!confirm('确定要删除这个对话吗？')) return;
+        
+        fetch('{% url 'delete_chat' %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                chat_id: chatId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (chatId == currentChatId) {
+                    // 如果删除的是当前对话，刷新页面
+                    window.location.href = '{% url 'ai_chat' %}';
+                } else {
+                    // 否则更新对话列表
+                    updateChatList();
+                }
+            }
+        })
+        .catch(error => console.error('删除对话失败:', error));
+    }
+    
+    // 自动调整输入框高度
+    const chatInput = document.getElementById('chatInput');
+    chatInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+    
+    // 按下Enter发送消息，Shift+Enter换行
+    chatInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage(e);
+        }
+    });
+</script>
+</body>
+</html>

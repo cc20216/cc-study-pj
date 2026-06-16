@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日进度填写 - StudyFlow</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 复用首页样式 */
+        :root {
+            --bg-main: #F8FAFB;
+            --card-bg: #FFFFFF;
+            --mint: #81C784;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --border: #EDF2F7;
+        }
+
+        /* 暗夜模式变量 */
+        :root.dark {
+            --bg-main: #1A202C;
+            --card-bg: #2D3748;
+            --mint: #81C784;
+            --text-primary: #F7FAFC;
+            --text-secondary: #A0AEC0;
+            --border: #4A5568;
+        }
+
+        /* 确保所有元素在暗夜模式下正确显示 */
+        :root.dark {
+            /* 强制所有文本元素使用白色文字 */
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            p,
+            span,
+            div,
+            select,
+            option,
+            li,
+            i,
+            label {
+                color: white !important;
+            }
+
+            /* 确保卡片和容器使用深色背景，白色边框和适当模糊效果 */
+            .card,
+            .module-progress,
+            nav {
+                background-color: var(--card-bg) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+            }
+
+            /* 确保输入框、表单元素和图表使用深色背景和白色文字 */
+            input,
+            textarea,
+            select {
+                background: #4A5568 !important;
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.3) !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+            }
+
+            /* 确保按钮在暗夜模式下清晰可见 */
+            .btn-primary {
+                background: var(--mint) !important;
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+
+            .btn-secondary {
+                background: #4A5568 !important;
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+
+            /* 确保返回按钮在暗夜模式下清晰可见 */
+            .back-btn {
+                background: var(--mint) !important;
+                color: white !important;
+                border: 2px solid rgba(255, 255, 255, 0.2) !important;
+            }
+
+            /* 确保退出登录按钮在暗夜模式下清晰可见 */
+            a[href="/logout/"] {
+                background: #4A5568 !important;
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, "Noto Sans SC", sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        nav {
+            height: 64px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            padding: 24px 40px;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        
+        /* 移除原来的grid布局样式，改为在JavaScript中动态生成 */
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        h1, h2, h3, h4 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+                gap: 16px;
+            }
+            
+            nav {
+                padding: 0 16px;
+            }
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--mint);
+            box-shadow: 0 0 0 2px rgba(129, 199, 132, 0.2);
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--mint);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #E2E8F0;
+            color: var(--text-primary);
+        }
+
+        /* 模块进度卡片 */
+        .module-progress {
+            background: #F7FAFC;
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--mint);
+            color: white;
+            border: 2px solid var(--mint);
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            z-index: 1000;
+            opacity: 0.8;
+        }
+
+        .back-btn:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(129, 199, 132, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'progress_dashboard' %}?template_id={{ selected_template_id }}" class="back-btn">返回进度看板</a>
+    
+    <nav>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+                <div style="display: flex; align-items: center; gap: 10px; font-weight: bold; color: var(--mint); font-size: 1.2rem;">
+                    <i data-lucide="leaf"></i> StudyFlow
+                </div>
+            </a>
+            <button id="dark-mode-toggle" style="background: transparent; border: none; cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; color: var(--text-primary);">
+                <i data-lucide="moon" size="20"></i>
+            </button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <span style="font-size: 0.9rem; color: var(--text-secondary);">{{ today_date }}</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>每日学习进度填写</h2>
+            <p style="color: var(--text-secondary); margin: 10px 0 0;">记录今天的学习成果，保持学习习惯</p>
+        </div>
+
+        <div class="card">
+            <form method="POST" action="{% url 'submit_daily_progress' %}">
+                {% csrf_token %}
+                
+                <!-- 选择学习计划 -->
+                <div class="form-group">
+                    <label for="template">选择学习计划</label>
+                    <select id="template" name="template" required>
+                        {% for template in templates %}
+                        <option value="{{ template.id }}" {% if selected_template_id and template.id|stringformat:'s' == selected_template_id|stringformat:'s' %}selected{% endif %}>{{ template.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- 学习时间输入 -->
+                <div class="form-group">
+                    <label for="learning_time">今日学习总时长 (小时)</label>
+                    <input type="number" 
+                           id="learning_time" 
+                           name="learning_time" 
+                           min="0" 
+                           step="0.5" 
+                           placeholder="请输入今日学习总时长，例如：2.5" 
+                           required>
+                </div>
+
+                <!-- 模块进度填写 -->
+                <div id="module-progress" style="margin-top: 24px;">
+                    <!-- 这里会通过JavaScript动态生成模块进度表单 -->
+                </div>
+
+                <!-- 从后端获取的模块数据 -->
+                {{ templates_with_modules|json_script:"modules_data" }}
+                
+                <script>
+                    // 从HTML元素获取模块数据
+                    const modulesDataElement = document.getElementById('modules_data');
+                    const templatesWithModules = JSON.parse(modulesDataElement.textContent);
+                    
+                    // 监听模板选择变化，动态生成模块进度表单
+                    document.getElementById('template').addEventListener('change', function() {
+                        const templateId = this.value;
+                        const moduleProgressDiv = document.getElementById('module-progress');
+                        
+                        // 根据模板ID获取真实的模块数据
+                        let modules = [];
+                        if (templateId && templatesWithModules[templateId]) {
+                            modules = templatesWithModules[templateId];
+                        }
+                        
+                        // 生成模块进度表单
+            let html = '';
+            
+            if (modules.length > 0) {
+                // 生成模块容器，包含标题和模块网格
+                html += `
+                    <div style="margin-bottom: 24px;">
+                        <h4 style="margin-bottom: 16px;">模块进度</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(50% - 12px), 1fr)); gap: 24px;">
+                `;
+                
+                modules.forEach(module => {
+                        // 默认显示可量化目标输入框
+                        let inputField = `
+                            <input type="number" 
+                                   id="module-${module.id}" 
+                                   name="module_${module.id}" 
+                                   min="0" 
+                                   max="${module.target_value || 100}" 
+                                   placeholder="请输入今日完成量"
+                                   style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem;">
+                        `;
+                        
+                        // 根据模块类型显示不同的输入字段
+                        if (module.target_type === 'boolean') {
+                            inputField = `
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <input type="checkbox" 
+                                           id="module-${module.id}" 
+                                           name="module_${module.id}" 
+                                           value="1" 
+                                           style="width: auto; margin-right: 8px;">
+                                    <label for="module-${module.id}" style="margin: 0; font-weight: normal;">是否完成</label>
+                                </div>
+                            `;
+                        } else if (module.target_type === 'text') {
+                            inputField = `
+                                <textarea 
+                                    id="module-${module.id}" 
+                                    name="module_text_${module.id}" 
+                                    rows="3" 
+                                    placeholder="请描述今日完成情况"
+                                    style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem;">
+                                </textarea>
+                            `;
+                        }
+                        
+                        html += `
+                        <div class="module-progress">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <h4 style="margin: 0; font-size: 1rem; color: var(--text-primary);">${module.name}</h4>
+                                <span style="font-size: 0.85rem; color: var(--text-secondary);">
+                                    ${module.target_type === 'numeric' ? `目标: ${module.target_value}` : ''} (${module.target_type === 'numeric' ? '可量化目标' : module.target_type === 'boolean' ? '完成判断' : '主观描述'})
+                                </span>
+                            </div>
+                            
+                            <!-- 完成量输入 -->
+                            <div style="margin-bottom: 12px;">
+                                ${inputField}
+                            </div>
+                            
+                            <!-- 显示模块完成状态和鼓励信息 -->
+                            ${module.is_completed ? `
+                            <div style="margin-top: 12px; font-size: 0.85rem; color: var(--mint); display: flex; align-items: center; gap: 8px;">
+                                <i data-lucide="check-circle" size="16"></i>
+                                ✅ 恭喜你完成了该模块！继续保持！
+                            </div>
+                            ` : ''}
+                            
+                            <!-- 显示模块累计完成情况 -->
+                            ${module.target_type === 'numeric' ? `
+                            <div style="margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+                                累计完成: ${module.total_actual_value}/${module.target_value} (${module.completion_rate}%)
+                            </div>
+                            ` : ''}
+                        </div>
+                        `;
+                    });
+                
+                // 关闭模块容器
+                html += '</div></div>';
+            } else {
+                html += '<p style="color: var(--text-secondary);">该模板暂无模块，请先添加模块</p>';
+            }
+                        
+                        moduleProgressDiv.innerHTML = html;
+                    });
+                    
+                    // 页面加载时触发一次，生成默认模板的模块表单
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const templateSelect = document.getElementById('template');
+                        // 如果没有选中的模板，默认选择第一个模板
+                        if (!templateSelect.value) {
+                            templateSelect.value = Object.keys(templatesWithModules)[0];
+                        }
+                        templateSelect.dispatchEvent(new Event('change'));
+                    });
+                </script>
+
+                <!-- 学习备注 -->
+                <div class="form-group">
+                    <label for="notes">今日学习备注</label>
+                    <textarea id="notes" name="notes" rows="4" placeholder="请输入今日学习的感受或收获..."></textarea>
+                </div>
+
+                <!-- 提交按钮 -->
+                <div style="display: flex; gap: 16px; margin-top: 32px;">
+                    <button type="submit" class="btn btn-primary">保存进度</button>
+                    <a href="{% url 'progress_dashboard' %}?template_id={{ selected_template_id }}" class="btn btn-secondary">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        // 后续添加动态生成模块进度表单的JavaScript代码
+        
+        // 暗夜模式初始化
+        const root = document.documentElement;
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        
+        // 检查本地存储或系统偏好
+        const isDarkMode = localStorage.getItem('darkMode') === 'true' || 
+                         (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && 
+                          localStorage.getItem('darkMode') === null);
+        
+        // 设置初始模式
+        if (isDarkMode) {
+            root.classList.add('dark');
+        }
+        
+        // 切换按钮点击事件
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', function() {
+                root.classList.toggle('dark');
+                
+                // 保存设置到本地存储
+                const isDark = root.classList.contains('dark');
+                localStorage.setItem('darkMode', isDark);
+                
+                // 更新图标
+                updateDarkModeIcon();
+            });
+            
+            // 更新图标函数
+            function updateDarkModeIcon() {
+                const icon = darkModeToggle.querySelector('i');
+                if (icon) {
+                    if (root.classList.contains('dark')) {
+                        icon.setAttribute('data-lucide', 'moon');
+                    } else {
+                        icon.setAttribute('data-lucide', 'sun');
+                    }
+                    // 重新渲染图标
+                    lucide.createIcons();
+                }
+            }
+            
+            // 初始更新图标
+            updateDarkModeIcon();
+        }
+    </script>
+</body>
+</html>

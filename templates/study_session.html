@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沉浸学习模式</title>
+    <style>
+        /* 极简护眼风格 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* CSS变量定义 */
+        :root {
+            --bg-main: #f8fafc;
+            --card-bg: white;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --border: #e2e8f0;
+            --heading-color: #4a6fa5;
+            --timer-color: #2d3748;
+            --mint: #81c784;
+            --purple: #6366f1;
+        }
+
+        /* 暗夜模式变量 */
+        :root.dark {
+            --bg-main: #1a202c;
+            --card-bg: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #a0aec0;
+            --border: #4a5568;
+            --heading-color: #81c784;
+            --timer-color: #f7fafc;
+            --mint: #81c784;
+            --purple: #6366f1;
+        }
+
+        /* 确保所有元素在暗夜模式下正确显示 */
+        :root.dark {
+            /* 强制所有文本元素使用白色文字 */
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            p,
+            span,
+            div,
+            select,
+            option,
+            li,
+            i,
+            label {
+                color: white !important;
+            }
+
+            /* 确保容器使用深色背景，白色边框和适当模糊效果 */
+            .container,
+            div[style*="background: white"],
+            div[style*="background-color: white"],
+            div[style*="background: #FFF"],
+            div[style*="background: #ffffff"],
+            div[style*="background: #F7FAFC"] {
+                background-color: var(--bg-main) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+            }
+
+            /* 确保表单元素在暗夜模式下清晰可见 */
+            input,
+            textarea {
+                background: #4a5568 !important;
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.3) !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+            }
+
+            /* 确保弹窗在暗夜模式下清晰可见 */
+            .modal-content {
+                background: var(--card-bg) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+            }
+
+            .modal-header {
+                background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+            }
+
+            /* 确保返回按钮在暗夜模式下清晰可见 */
+            .back-btn {
+                border-color: var(--mint) !important;
+                color: var(--mint) !important;
+            }
+
+            .back-btn:hover {
+                background: var(--mint) !important;
+                color: white !important;
+            }
+
+            /* 确保按钮使用白色边框 */
+            button {
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 60px 20px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            color: var(--heading-color);
+            font-weight: 300;
+        }
+
+        /* 计时器样式 */
+        #timer {
+            font-size: 6rem;
+            font-weight: 100;
+            margin: 50px 0;
+            color: var(--timer-color);
+            font-family: 'Courier New', monospace;
+        }
+
+        /* 按钮组 */
+        .button-group {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin: 60px 0;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        #start-btn {
+            background: linear-gradient(135deg, #81c784, #66bb6a);
+            color: white;
+        }
+
+        #start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(129, 199, 132, 0.2);
+        }
+
+        #pause-btn {
+            background: linear-gradient(135deg, #ffb74d, #ffa726);
+            color: white;
+        }
+
+        #pause-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 183, 77, 0.2);
+        }
+
+        #reset-btn {
+            background: linear-gradient(135deg, #ef5350, #e53935);
+            color: white;
+        }
+
+        #reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 83, 80, 0.2);
+        }
+
+        /* 表单样式 */
+        .study-form {
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #4a6fa5;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* 结束按钮 */
+        #end-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        #end-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: transparent;
+            border: 2px solid #4a6fa5;
+            color: #4a6fa5;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #4a6fa5;
+            color: white;
+        }
+
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        #study-form {
+            padding: 24px;
+            margin: 0;
+        }
+
+        /* 表单样式优化 */
+        .form-group {
+            margin: 0 0 20px 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* 弹窗底部按钮 */
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn-cancel,
+        .btn-submit {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .btn-cancel:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* 按钮样式优化 */
+        #end-study-btn {
+            background: linear-gradient(135deg, #9575cd, #7e57c2);
+            color: white;
+        }
+
+        #end-study-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(149, 117, 205, 0.2);
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            #timer {
+                font-size: 4rem;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            button {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'home' %}" class="back-btn">返回首页</a>
+    
+    <div class="container">
+        <h1>沉浸学习模式</h1>
+        
+        <div id="timer">00:00:00</div>
+        
+        <div class="button-group">
+            <button id="start-btn">开始学习</button>
+            <button id="pause-btn">暂停</button>
+            <button id="reset-btn">重置</button>
+            <button id="end-study-btn">结束学习</button>
+        </div>
+    </div>
+    
+    <!-- 结束学习弹窗 -->
+    <div id="end-study-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>记录学习内容</h2>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <form id="study-form" method="POST" action="{% url 'study_session_end' %}">
+                {% csrf_token %}
+                <input type="hidden" name="duration" id="duration-input">
+                
+                <div class="form-group">
+                    <label for="subject">学习科目</label>
+                    <input type="text" id="subject" name="subject" placeholder="请输入学习科目（如：英语四级）" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">学习备注</label>
+                    <textarea id="notes" name="notes" placeholder="请输入学习备注（可选）"></textarea>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" id="cancel-btn">取消</button>
+                    <button type="submit" class="btn-submit">保存记录</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 暗夜模式初始化
+        const root = document.documentElement;
+        
+        // 检查本地存储中的暗夜模式设置
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        
+        // 设置初始模式
+        if (isDarkMode) {
+            root.classList.add('dark');
+        }
+        
+        // 计时器逻辑
+        let timer = null;
+        let seconds = 0;
+        let isRunning = false;
+
+        // 格式化时间
+        function formatTime(secs) {
+            const h = Math.floor(secs / 3600).toString().padStart(2, '0');
+            const m = Math.floor((secs % 3600) / 60).toString().padStart(2, '0');
+            const s = (secs % 60).toString().padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+
+        // 更新计时器显示
+        function updateTimer() {
+            seconds++;
+            document.getElementById('timer').textContent = formatTime(seconds);
+        }
+
+        // 开始计时
+        document.getElementById('start-btn').addEventListener('click', () => {
+            if (!isRunning) {
+                timer = setInterval(updateTimer, 1000);
+                isRunning = true;
+            }
+        });
+
+        // 暂停计时
+        document.getElementById('pause-btn').addEventListener('click', () => {
+            if (isRunning) {
+                clearInterval(timer);
+                isRunning = false;
+            }
+        });
+
+        // 重置计时
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            clearInterval(timer);
+            isRunning = false;
+            seconds = 0;
+            document.getElementById('timer').textContent = formatTime(seconds);
+        });
+
+        // 弹窗逻辑
+        const modal = document.getElementById('end-study-modal');
+        const endStudyBtn = document.getElementById('end-study-btn');
+        const closeBtn = document.getElementById('close-modal');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const form = document.getElementById('study-form');
+
+        // 打开弹窗
+        endStudyBtn.addEventListener('click', () => {
+            modal.classList.add('show');
+        });
+
+        // 关闭弹窗
+        function closeModal() {
+            modal.classList.remove('show');
+        }
+
+        // 关闭按钮事件
+        closeBtn.addEventListener('click', closeModal);
+
+        // 取消按钮事件
+        cancelBtn.addEventListener('click', closeModal);
+
+        // 点击弹窗外部关闭
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // 表单提交前设置时长
+        form.addEventListener('submit', (e) => {
+            // 阻止表单默认提交
+            e.preventDefault();
+            
+            // 计算学习时长（分钟）
+            const durationMinutes = Math.floor(seconds / 60);
+            
+            // 设置时长值
+            document.getElementById('duration-input').value = durationMinutes;
+            
+            // 提交表单
+            e.target.submit();
+        });
+    </script>
+</body>
+</html>

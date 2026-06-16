@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CET-4词汇学习资料 - StudyFlow</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 复用首页样式 */
+        :root {
+            --bg-main: #F8FAFB;
+            --card-bg: #FFFFFF;
+            --mint: #81C784;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --border: #EDF2F7;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, "Noto Sans SC", sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        nav {
+            height: 64px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .container {
+            flex-grow: 1;
+            padding: 24px 40px;
+            overflow: hidden;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .back-button:hover {
+            background: #F7FAFC;
+        }
+
+        .main-content {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 32px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            min-height: calc(100vh - 180px);
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--mint);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #66BB6A;
+        }
+
+        .btn-secondary {
+            background: #E2E8F0;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #CBD5E0;
+        }
+
+        /* 学习资料标题 */
+        .materials-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .materials-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        /* 词汇功能区 */
+        .vocab-functions {
+            background: #F7FAFC;
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+        }
+
+        .functions-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .function-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        /* 搜索区域 */
+        .search-area {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        /* 随机抽查区域 */
+        .random-check-area {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .check-title {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .random-word-display {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .random-word {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .random-meaning {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .check-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* 搜索结果区域 */
+        .search-result-area {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .result-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .result-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        /* 词汇列表区域 */
+        .vocab-list-area {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .list-title {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .vocab-list {
+            max-height: 500px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 12px;
+        }
+
+        .vocab-item {
+            background: #F7FAFC;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .vocab-item-word {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .vocab-item-meaning {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* 隐藏区域 */
+        .hidden {
+            display: none;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .materials-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-area {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-input {
+                min-width: auto;
+            }
+
+            .vocab-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'home' %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 10px; font-weight: bold; color: var(--mint); font-size: 1.2rem;">
+                <i data-lucide="leaf"></i> StudyFlow
+            </div>
+        </a>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: var(--text-primary);">首页</a>
+            <a href="{% url 'cet4_study' %}" class="btn btn-secondary">
+                <i data-lucide="book-open" size="16"></i>
+                返回学习
+            </a>
+            <a href="{% url 'logout' %}" style="background: #E2E8F0; padding: 8px 16px; border-radius: 8px; text-decoration: none; color: var(--text-primary); font-size: 0.9rem;">退出登录</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- 返回按钮 -->
+            <a href="{% url 'cet4_study' '词汇' %}" class="back-button">
+                <i data-lucide="arrow-left" size="16"></i>
+                返回词汇学习
+            </a>
+
+            <!-- 学习资料标题 -->
+            <div class="materials-header">
+                <div style="width: 40px; height: 40px; background: var(--mint); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                    <i data-lucide="book-open" size="24"></i>
+                </div>
+                <h1 class="materials-title">CET-4词汇学习资料</h1>
+            </div>
+
+            <!-- 词汇功能区 -->
+            <div class="vocab-functions">
+                <h2 class="functions-title">词汇学习功能</h2>
+                
+                <!-- 随机抽查功能 -->
+                <div class="function-buttons">
+                    <button id="start-random-check" class="btn btn-primary">
+                        <i data-lucide="shuffle" size="16"></i>
+                        开始随机抽查
+                    </button>
+                    <button id="start-search" class="btn btn-secondary">
+                        <i data-lucide="search" size="16"></i>
+                        开始单词搜索
+                    </button>
+                </div>
+
+                <!-- 搜索区域 -->
+                <div id="search-area" class="search-area hidden">
+                    <input type="text" id="word-search" class="search-input" placeholder="搜索单词或释义...">
+                    <button id="search-btn" class="btn btn-secondary">
+                        <i data-lucide="search" size="16"></i>
+                        搜索
+                    </button>
+                </div>
+            </div>
+
+            <!-- 随机抽查区域 -->
+            <div id="random-check-section" class="random-check-area hidden">
+                <h3 class="check-title">随机抽查</h3>
+                <div class="random-word-display">
+                    <div id="random-word" class="random-word">--</div>
+                    <div id="random-meaning" class="random-meaning">点击"显示释义"查看释义</div>
+                    <div class="check-controls">
+                        <button id="show-meaning" class="btn btn-secondary">显示释义</button>
+                        <button id="next-word" class="btn btn-primary">下一个</button>
+                        <button id="mark-known" class="btn btn-secondary">已掌握</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 搜索结果区域 -->
+            <div id="search-result-section" class="search-result-area hidden">
+                <h3 class="result-title">搜索结果</h3>
+                <div id="search-result" class="result-content"></div>
+            </div>
+
+            <!-- 高频词汇列表 -->
+            <div class="vocab-list-area">
+                <h3 class="list-title">CET-4高频词汇</h3>
+                <div class="vocab-list" id="vocab-list">
+                    <!-- 词汇列表将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // 词汇数据
+        const vocabData = [
+            { word: 'abandon', meaning: 'vt. 放弃；抛弃' },
+            { word: 'ability', meaning: 'n. 能力；才能' },
+            { word: 'able', meaning: 'adj. 能够的；有能力的' },
+            { word: 'abnormal', meaning: 'adj. 不正常的；反常的' },
+            { word: 'aboard', meaning: 'adv./prep. 在船(车)上；上船' },
+            { word: 'about', meaning: 'prep. 关于；大约' },
+            { word: 'above', meaning: 'prep. 在...上面；超过' },
+            { word: 'abroad', meaning: 'adv. 在国外；到国外' },
+            { word: 'absence', meaning: 'n. 缺席；缺乏' },
+            { word: 'absolute', meaning: 'adj. 绝对的；完全的' },
+            { word: 'absorb', meaning: 'vt. 吸收；吸引' },
+            { word: 'abstract', meaning: 'adj. 抽象的 n. 摘要' },
+            { word: 'abundant', meaning: 'adj. 丰富的；充裕的' },
+            { word: 'abuse', meaning: 'vt./n. 滥用；虐待' },
+            { word: 'academic', meaning: 'adj. 学术的；学院的' },
+            { word: 'accelerate', meaning: 'vt. 加速；促进' },
+            { word: 'accent', meaning: 'n. 口音；重音' },
+            { word: 'accept', meaning: 'vt. 接受；认可' },
+            { word: 'access', meaning: 'n. 通道；接近 vt. 接近' },
+            { word: 'accident', meaning: 'n. 事故；意外' },
+            { word: 'accommodate', meaning: 'vt. 容纳；提供住宿' },
+            { word: 'accompany', meaning: 'vt. 陪伴；伴随' },
+            { word: 'accomplish', meaning: 'vt. 完成；实现' },
+            { word: 'accord', meaning: 'n. 一致；协议 vt. 给予' },
+            { word: 'account', meaning: 'n. 账户；描述 vi. 说明' },
+            { word: 'accumulate', meaning: 'vt./vi. 积累；积聚' },
+            { word: 'accuracy', meaning: 'n. 准确性；精确性' },
+            { word: 'accurate', meaning: 'adj. 准确的；精确的' },
+            { word: 'accuse', meaning: 'vt. 指责；控告' },
+            { word: 'achieve', meaning: 'vt. 实现；达到' },
+            { word: 'achievement', meaning: 'n. 成就；完成' },
+            { word: 'acid', meaning: 'adj. 酸的 n. 酸' },
+            { word: 'acknowledge', meaning: 'vt. 承认；感谢' },
+            { word: 'acquire', meaning: 'vt. 获得；学到' },
+            { word: 'acquisition', meaning: 'n. 获得；习得' },
+            { word: 'across', meaning: 'prep. 穿过；在...对面' },
+            { word: 'act', meaning: 'vi. 行动；表演 vt. 扮演 n. 行为' },
+            { word: 'action', meaning: 'n. 行动；活动' },
+            { word: 'active', meaning: 'adj. 活跃的；积极的' },
+            { word: 'activity', meaning: 'n. 活动；活跃' },
+            { word: 'actor', meaning: 'n. 男演员' },
+            { word: 'actress', meaning: 'n. 女演员' },
+            { word: 'actual', meaning: 'adj. 实际的；真实的' },
+            { word: 'actually', meaning: 'adv. 实际上；事实上' },
+            { word: 'acute', meaning: 'adj. 严重的；敏锐的' },
+            { word: 'adapt', meaning: 'vt. 使适应；改编 vi. 适应' },
+            { word: 'add', meaning: 'vt./vi. 添加；增加' },
+            { word: 'addition', meaning: 'n. 加法；增加' },
+            { word: 'additional', meaning: 'adj. 额外的；附加的' },
+            { word: 'address', meaning: 'n. 地址；演讲 vt. 演说；处理' },
+            { word: 'adequate', meaning: 'adj. 足够的；适当的' },
+            { word: 'adjust', meaning: 'vt./vi. 调整；适应' },
+            { word: 'administration', meaning: 'n. 管理；行政' },
+            { word: 'admire', meaning: 'vt. 钦佩；赞美' },
+            { word: 'admit', meaning: 'vt. 承认；准许进入' },
+            { word: 'adopt', meaning: 'vt. 采用；收养' },
+            { word: 'adult', meaning: 'adj. 成年的 n. 成年人' },
+            { word: 'advance', meaning: 'vi. 前进；进展 n. 前进；预付款' },
+            { word: 'advanced', meaning: 'adj. 先进的；高级的' },
+            { word: 'advantage', meaning: 'n. 优势；有利条件' },
+            { word: 'adventure', meaning: 'n. 冒险；奇遇' },
+            { word: 'adverb', meaning: 'n. 副词' },
+            { word: 'advertise', meaning: 'vt./vi. 做广告' },
+            { word: 'advertisement', meaning: 'n. 广告' },
+            { word: 'advice', meaning: 'n. 建议；忠告' },
+            { word: 'advise', meaning: 'vt./vi. 建议；劝告' },
+            { word: 'advocate', meaning: 'vt. 提倡；主张 n. 倡导者' },
+            { word: 'aeroplane', meaning: 'n. 飞机' },
+            { word: 'affair', meaning: 'n. 事情；事件' },
+            { word: 'affect', meaning: 'vt. 影响；感动' },
+            { word: 'affection', meaning: 'n. 爱；感情' },
+            { word: 'afford', meaning: 'vt. 买得起；承担得起' },
+            { word: 'afraid', meaning: 'adj. 害怕的；担心的' },
+            { word: 'after', meaning: 'prep. 在...之后 conj. 在...之后 adv. 之后' },
+            { word: 'afternoon', meaning: 'n. 下午' },
+            { word: 'afterward(s)', meaning: 'adv. 后来；以后' },
+            { word: 'again', meaning: 'adv. 再；又' },
+            { word: 'against', meaning: 'prep. 反对；靠着' },
+            { word: 'age', meaning: 'n. 年龄；时代 vi. 变老' },
+            { word: 'agency', meaning: 'n. 代理；机构' },
+            { word: 'agent', meaning: 'n. 代理人；经纪人' },
+            { word: 'ago', meaning: 'adv. 以前' },
+            { word: 'agree', meaning: 'vi. 同意；赞成 vt. 同意' },
+            { word: 'agreement', meaning: 'n. 同意；协议' },
+            { word: 'agriculture', meaning: 'n. 农业；农学' },
+            { word: 'ahead', meaning: 'adv. 向前；提前' },
+            { word: 'aid', meaning: 'n. 援助；帮助 vt. 帮助' },
+            { word: 'aim', meaning: 'vi. 瞄准；旨在 vt. 瞄准 n. 目标' },
+            { word: 'air', meaning: 'n. 空气；天空 vt. 晾干；通风' },
+            { word: 'aircraft', meaning: 'n. 飞机；航空器' },
+            { word: 'airline', meaning: 'n. 航空公司；航线' },
+            { word: 'airport', meaning: 'n. 机场；航空站' },
+            { word: 'alarm', meaning: 'n. 警报；惊恐 vt. 使惊恐' },
+            { word: 'alcohol', meaning: 'n. 酒精；乙醇' },
+            { word: 'alert', meaning: 'adj. 警觉的；警惕的 vt. 使警觉' },
+            { word: 'alike', meaning: 'adj. 相似的 adv. 一样地' },
+            { word: 'alive', meaning: 'adj. 活着的；活跃的' },
+            { word: 'all', meaning: 'adj. 所有的 pron. 全部 adv. 完全' },
+            { word: 'allocate', meaning: 'vt. 分配；分派' },
+            { word: 'allow', meaning: 'vt. 允许；准许' },
+            { word: 'ally', meaning: 'n. 盟友；同盟国 vt. 使结盟' },
+            { word: 'almost', meaning: 'adv. 几乎；差不多' },
+            { word: 'alone', meaning: 'adj. 单独的 adv. 独自地' },
+            { word: 'along', meaning: 'prep. 沿着 adv. 向前' },
+            { word: 'aloud', meaning: 'adv. 大声地；出声地' },
+            { word: 'alphabet', meaning: 'n. 字母表' },
+            { word: 'already', meaning: 'adv. 已经；早已' },
+            { word: 'also', meaning: 'adv. 也；同样' },
+            { word: 'alter', meaning: 'vt./vi. 改变；修改' },
+            { word: 'alternative', meaning: 'adj. 替代的 n. 替代品' },
+            { word: 'although', meaning: 'conj. 尽管；虽然' },
+            { word: 'altogether', meaning: 'adv. 完全；总共' },
+            { word: 'always', meaning: 'adv. 总是；一直' },
+            { word: 'amateur', meaning: 'adj. 业余的 n. 业余爱好者' },
+            { word: 'amaze', meaning: 'vt. 使惊讶；使惊愕' },
+            { word: 'ambassador', meaning: 'n. 大使；使节' },
+            { word: 'ambiguous', meaning: 'adj. 模糊的；模棱两可的' },
+            { word: 'ambition', meaning: 'n. 野心；抱负' },
+            { word: 'ambitious', meaning: 'adj. 有野心的；有抱负的' },
+            { word: 'ambulance', meaning: 'n. 救护车' },
+            { word: 'America', meaning: 'n. 美洲；美国' },
+            { word: 'American', meaning: 'adj. 美洲的；美国的 n. 美国人' },
+            { word: 'among', meaning: 'prep. 在...之中' },
+            { word: 'amount', meaning: 'n. 数量；总额 vi. 总计' },
+            { word: 'ample', meaning: 'adj. 充足的；丰富的' },
+            { word: 'amplify', meaning: 'vt. 放大；增强' },
+            { word: 'amuse', meaning: 'vt. 逗乐；使发笑' },
+            { word: 'analyze', meaning: 'vt. 分析；分解' },
+            { word: 'analysis', meaning: 'n. 分析；分解' },
+            { word: 'ancestor', meaning: 'n. 祖先；先驱' },
+            { word: 'anchor', meaning: 'n. 锚 vt. 抛锚；固定' },
+            { word: 'ancient', meaning: 'adj. 古代的；古老的' },
+            { word: 'and', meaning: 'conj. 和；与' },
+            { word: 'anger', meaning: 'n. 愤怒 vt. 使愤怒' },
+            { word: 'angle', meaning: 'n. 角度；观点' },
+            { word: 'angry', meaning: 'adj. 生气的；愤怒的' },
+            { word: 'animal', meaning: 'n. 动物' },
+            { word: 'ankle', meaning: 'n. 脚踝' },
+            { word: 'announce', meaning: 'vt. 宣布；宣告' },
+            { word: 'announcement', meaning: 'n. 宣布；通告' },
+            { word: 'annual', meaning: 'adj. 每年的；年度的 n. 年刊' },
+            { word: 'another', meaning: 'adj. 另一个的 pron. 另一个' },
+            { word: 'answer', meaning: 'n. 答案；回答 vt./vi. 回答' },
+            { word: 'anticipate', meaning: 'vt. 预期；期望' },
+            { word: 'anxiety', meaning: 'n. 焦虑；忧虑' },
+            { word: 'anxious', meaning: 'adj. 焦虑的；渴望的' },
+            { word: 'any', meaning: 'adj. 任何的 pron. 任何 adv. 稍微' },
+            { word: 'anybody', meaning: 'pron. 任何人' },
+            { word: 'anyhow', meaning: 'adv. 无论如何；不管怎样' },
+            { word: 'anyone', meaning: 'pron. 任何人' },
+            { word: 'anything', meaning: 'pron. 任何事' },
+            { word: 'anyway', meaning: 'adv. 无论如何；不管怎样' },
+            { word: 'anywhere', meaning: 'adv. 任何地方' },
+            { word: 'apart', meaning: 'adv. 分开；分离' },
+            { word: 'apartment', meaning: 'n. 公寓；套间' },
+            { word: 'apologize', meaning: 'vi. 道歉；认错' },
+            { word: 'apology', meaning: 'n. 道歉；认错' },
+            { word: 'apparent', meaning: 'adj. 明显的；表面的' },
+            { word: 'apparently', meaning: 'adv. 显然；表面上' },
+            { word: 'appeal', meaning: 'vi. 呼吁；吸引；上诉 n. 呼吁；吸引力' },
+            { word: 'appear', meaning: 'vi. 出现；似乎' },
+            { word: 'appearance', meaning: 'n. 外观；出现' },
+            { word: 'apple', meaning: 'n. 苹果' },
+            { word: 'application', meaning: 'n. 应用；申请；应用程序' },
+            { word: 'apply', meaning: 'vt. 应用；申请 vi. 申请；适用' },
+            { word: 'appoint', meaning: 'vt. 任命；约定' },
+            { word: 'appointment', meaning: 'n. 任命；约会' },
+            { word: 'appreciate', meaning: 'vt. 欣赏；感激；理解' },
+            { word: 'approach', meaning: 'vt. 接近；靠近 n. 方法；途径' },
+            { word: 'appropriate', meaning: 'adj. 适当的；合适的 vt. 占用；拨款' },
+            { word: 'approval', meaning: 'n. 批准；认可' },
+            { word: 'approve', meaning: 'vt. 批准；赞成 vi. 赞成' },
+            { word: 'approximate', meaning: 'adj. 近似的；大约的 vt./vi. 接近' },
+            { word: 'approximately', meaning: 'adv. 大约；近似地' }
+        ];
+
+        // 生成词汇列表
+        const generateVocabList = () => {
+            const vocabList = document.getElementById('vocab-list');
+            vocabList.innerHTML = vocabData.map(vocab => `
+                <div class="vocab-item">
+                    <div class="vocab-item-word">${vocab.word}</div>
+                    <div class="vocab-item-meaning">${vocab.meaning}</div>
+                </div>
+            `).join('');
+        };
+
+        // 初始化词汇列表
+        generateVocabList();
+
+        // 随机抽查功能
+        let currentWordIndex = -1;
+        let showingMeaning = false;
+
+        const startRandomCheckBtn = document.getElementById('start-random-check');
+        const randomCheckSection = document.getElementById('random-check-section');
+        const randomWord = document.getElementById('random-word');
+        const randomMeaning = document.getElementById('random-meaning');
+        const showMeaningBtn = document.getElementById('show-meaning');
+        const nextWordBtn = document.getElementById('next-word');
+        const markKnownBtn = document.getElementById('mark-known');
+
+        startRandomCheckBtn.addEventListener('click', () => {
+            // 隐藏其他区域
+            document.getElementById('search-result-section').classList.add('hidden');
+            document.getElementById('search-area').classList.add('hidden');
+            
+            // 显示随机抽查区域
+            randomCheckSection.classList.remove('hidden');
+            showNextWord();
+        });
+
+        const showNextWord = () => {
+            currentWordIndex = Math.floor(Math.random() * vocabData.length);
+            randomWord.textContent = vocabData[currentWordIndex].word;
+            randomMeaning.textContent = '点击"显示释义"查看释义';
+            showingMeaning = false;
+        };
+
+        showMeaningBtn.addEventListener('click', () => {
+            if (!showingMeaning) {
+                randomMeaning.textContent = vocabData[currentWordIndex].meaning;
+                showingMeaning = true;
+            }
+        });
+
+        nextWordBtn.addEventListener('click', () => {
+            showNextWord();
+        });
+
+        markKnownBtn.addEventListener('click', () => {
+            // 这里可以添加已掌握单词的处理逻辑
+            alert('已标记为掌握！');
+            showNextWord();
+        });
+
+        // 搜索功能
+        const startSearchBtn = document.getElementById('start-search');
+        const searchArea = document.getElementById('search-area');
+        const searchBtn = document.getElementById('search-btn');
+        const wordSearch = document.getElementById('word-search');
+        const searchResultSection = document.getElementById('search-result-section');
+        const searchResult = document.getElementById('search-result');
+
+        startSearchBtn.addEventListener('click', () => {
+            // 隐藏其他区域
+            randomCheckSection.classList.add('hidden');
+            searchResultSection.classList.add('hidden');
+            
+            // 显示搜索区域
+            searchArea.classList.remove('hidden');
+            wordSearch.focus();
+        });
+
+        const performSearch = () => {
+            const query = wordSearch.value.trim().toLowerCase();
+            if (!query) {
+                searchResult.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px;">请输入搜索词</p>';
+                return;
+            }
+
+            const results = vocabData.filter(vocab => 
+                vocab.word.toLowerCase().includes(query) || 
+                vocab.meaning.toLowerCase().includes(query)
+            );
+
+            if (results.length > 0) {
+                searchResult.innerHTML = results.map(vocab => `
+                    <div class="result-item">
+                        <div style="font-weight: 600; margin-bottom: 4px;">${vocab.word}</div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem;">${vocab.meaning}</div>
+                    </div>
+                `).join('');
+            } else {
+                searchResult.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px;">未找到匹配的单词</p>';
+            }
+
+            // 显示搜索结果区域
+            searchResultSection.classList.remove('hidden');
+        };
+
+        searchBtn.addEventListener('click', performSearch);
+
+        wordSearch.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - StudyFlow</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 复用首页样式 */
+        :root {
+            --bg-main: #F8FAFB;
+            --card-bg: #FFFFFF;
+            --mint: #81C784;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --border: #EDF2F7;
+        }
+
+        /* 暗夜模式变量 */
+        :root.dark {
+            --bg-main: #1A202C;
+            --card-bg: #2D3748;
+            --mint: #81C784;
+            --text-primary: #F7FAFC;
+            --text-secondary: #A0AEC0;
+            --border: #4A5568;
+        }
+
+        /* 确保所有元素在暗夜模式下正确显示 */
+        :root.dark {
+            /* 强制所有文本元素使用白色文字 */
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            p,
+            span,
+            div,
+            select,
+            option,
+            li,
+            i,
+            label {
+                color: white !important;
+            }
+
+            /* 强制所有卡片和容器使用深色背景 */
+            .card,
+            .stat-card,
+            div[style*="background: white"],
+            div[style*="background-color: white"],
+            div[style*="background: #FFF"],
+            div[style*="background: #ffffff"],
+            div[style*="background: var(--light-blue)"],
+            div[style*="background: var(--light-green)"],
+            div[style*="background: var(--light-orange)"],
+            label[style*="background: white"] {
+                background-color: var(--card-bg) !important;
+                border-color: var(--border) !important;
+            }
+
+            /* 强制所有输入框和表单元素使用深色背景和浅色文字 */
+            input[type="text"],
+            textarea,
+            select,
+            input[type="file"] {
+                background-color: #4A5568 !important;
+                color: white !important;
+                border-color: var(--border) !important;
+            }
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, "Noto Sans SC", sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        nav {
+            height: 64px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            padding: 24px 40px;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .container {
+                padding: 20px 30px;
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                padding: 20px;
+                gap: 20px;
+            }
+            
+            nav {
+                padding: 0 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+                gap: 16px;
+            }
+            
+            nav {
+                padding: 0 16px;
+            }
+            
+            /* 个人信息头部 */
+            .profile-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            
+            /* 统计卡片 */
+            .stats-grid {
+                grid-template-columns: 1fr !important;
+                gap: 16px !important;
+            }
+            
+            /* 按钮 */
+            .btn {
+                padding: 10px 20px !important;
+                font-size: 0.9rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* 表单输入 */
+            input, textarea {
+                padding: 10px !important;
+                font-size: 0.85rem !important;
+            }
+            
+            /* 头像 */
+            .avatar {
+                width: 80px !important;
+                height: 80px !important;
+                font-size: 2.5rem !important;
+            }
+        }
+
+        /* 个人信息卡片 */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--mint);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .profile-info h2 {
+            margin-bottom: 8px;
+        }
+
+        .profile-info p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* 标签样式 */
+        .label {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #E6FFFA;
+            color: #2B6CB0;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--mint);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #66BB6A;
+        }
+
+        .btn-secondary {
+            background: #E2E8F0;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #CBD5E0;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--mint);
+            box-shadow: 0 0 0 2px rgba(129, 199, 132, 0.2);
+        }
+
+        /* 统计数据卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .stat-card {
+            background: #F7FAFC;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--mint);
+        }
+
+        /* 成功信息 */
+        .success-message {
+            background: #F0FFF4;
+            color: #22543D;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #C6F6D5;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+                <div style="display: flex; align-items: center; gap: 10px; font-weight: bold; color: var(--mint); font-size: 1.2rem;">
+                    <i data-lucide="leaf"></i> StudyFlow
+                </div>
+            </a>
+            <button id="dark-mode-toggle" style="background: transparent; border: none; cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; color: var(--text-primary);">
+                <i data-lucide="moon" size="20"></i>
+            </button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: var(--text-primary);">首页</a>
+            <a href="{% url 'logout' %}" style="background: #E2E8F0; padding: 8px 16px; border-radius: 8px; text-decoration: none; color: var(--text-primary); font-size: 0.9rem;">退出登录</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 成功信息 -->
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="success-message">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <!-- 个人信息 -->
+        <div class="card">
+            <div class="profile-header">
+                <div class="avatar">
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="{{ user.username }}的头像" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    {% else %}
+                        <i data-lucide="user"></i>
+                    {% endif %}
+                </div>
+                <div class="profile-info">
+                    <h2>{{ user.username }}</h2>
+                    <p>{{ user.email }}</p>
+                    <span class="label">注册时间: {{ user.date_joined|date:"Y-m-d" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 学习统计 -->
+        <div class="card">
+            <h3>学习统计</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>累计学习时长</h3>
+                    <div class="stat-value">{{ profile.total_study_time|floatformat:1 }}h</div>
+                </div>
+                <div class="stat-card">
+                    <h3>连续学习天数</h3>
+                    <div class="stat-value">{{ profile.streak_days }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>学习计划数量</h3>
+                    <div class="stat-value">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 个人信息编辑 -->
+        <div class="card">
+            <h3>编辑个人信息</h3>
+            <form method="POST" action="{% url 'profile' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" value="{{ user.username }}" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">邮箱</label>
+                    <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                </div>
+
+                <!-- 头像上传功能 -->
+                <div class="form-group">
+                    <label for="avatar">头像</label>
+                    <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 16px;">
+                        <!-- 头像预览 -->
+                        <div style="width: 100px; height: 100px; border-radius: 50%; background: #F0FFF4; display: flex; align-items: center; justify-content: center; border: 2px dashed #42A5F5;">
+                            {% if profile.avatar %}
+                                <img id="avatar-preview" src="{{ profile.avatar.url }}" alt="当前头像" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%;">
+                            {% else %}
+                                <i id="avatar-preview-icon" data-lucide="user" size="40" color="#42A5F5"></i>
+                                <img id="avatar-preview" src="" alt="头像预览" style="display: none; width: 80px; height: 80px; object-fit: cover; border-radius: 50%;">
+                            {% endif %}
+                        </div>
+                        <div style="flex: 1;">
+                            {% if profile.avatar %}
+                                <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">当前已上传头像</p>
+                            {% else %}
+                                <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">尚未上传头像，使用默认头像</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <input type="file" id="avatar" name="avatar" accept="image/*" onchange="previewImage(this, 'avatar-preview', 'avatar-preview-icon')">
+                </div>
+
+                <!-- 玩偶图片上传功能 -->
+                <div class="form-group">
+                    <label for="doll_image">自定义玩偶图片</label>
+                    <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 16px;">
+                        <!-- 玩偶图片预览 -->
+                        <div style="width: 100px; height: 100px; border-radius: 50%; background: #F0FFF4; display: flex; align-items: center; justify-content: center; border: 2px dashed var(--mint);">
+                            {% if profile.doll_image %}
+                                <img id="doll-preview" src="{{ profile.doll_image.url }}" alt="当前玩偶图片" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%;">
+                            {% else %}
+                                <i id="doll-preview-icon" data-lucide="smile" size="40" color="var(--mint)"></i>
+                                <img id="doll-preview" src="" alt="玩偶预览" style="display: none; width: 80px; height: 80px; object-fit: cover; border-radius: 50%;">
+                            {% endif %}
+                        </div>
+                        <div style="flex: 1;">
+                            {% if profile.doll_image %}
+                                <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">当前已上传自定义玩偶图片</p>
+                            {% else %}
+                                <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">尚未上传自定义玩偶图片，使用默认玩偶</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <input type="file" id="doll_image" name="doll_image" accept="image/*" onchange="previewImage(this, 'doll-preview', 'doll-preview-icon')">
+                    <p style="margin-top: 8px; font-size: 0.8rem; color: var(--text-secondary);">建议上传正方形图片，最佳尺寸：200x200px</p>
+                </div>
+
+                <!-- 图片预览JavaScript -->
+                <script>
+                    // 图片预览功能
+                    function previewImage(input, previewId, iconId) {
+                        const preview = document.getElementById(previewId);
+                        const icon = document.getElementById(iconId);
+                        
+                        if (input.files && input.files[0]) {
+                            const reader = new FileReader();
+                            
+                            reader.onload = function(e) {
+                                preview.src = e.target.result;
+                                preview.style.display = 'block';
+                                if (icon) {
+                                    icon.style.display = 'none';
+                                }
+                            }
+                            
+                            reader.readAsDataURL(input.files[0]);
+                        }
+                    }
+                </script>
+
+                <button type="submit" class="btn btn-primary">保存更改</button>
+            </form>
+        </div>
+
+        <!-- 密码修改（后续完善） -->
+        <div class="card">
+            <h3>修改密码</h3>
+            <form method="POST" action="{% url 'profile' %}">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="old_password">原密码</label>
+                    <input type="password" id="old_password" name="old_password">
+                </div>
+
+                <div class="form-group">
+                    <label for="new_password1">新密码</label>
+                    <input type="password" id="new_password1" name="new_password1">
+                </div>
+
+                <div class="form-group">
+                    <label for="new_password2">确认新密码</label>
+                    <input type="password" id="new_password2" name="new_password2">
+                </div>
+
+                <button type="submit" class="btn btn-primary">修改密码</button>
+            </form>
+        </div>
+
+        <!-- 学习数据导出 -->
+        <div class="card">
+            <h3>学习数据导出</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                导出你的学习数据，包括学习会话和每日进度记录
+            </p>
+            <a href="{% url 'export_study_data' %}" class="btn btn-primary" style="text-decoration: none;">
+                <i data-lucide="download" size="18" style="margin-right: 8px;"></i>
+                导出CSV数据
+            </a>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 12px;">
+                数据将以CSV格式导出，可使用Excel或其他表格软件打开
+            </p>
+        </div>
+
+        <!-- 模板管理 -->
+        <div class="card">
+            <h3>模板管理</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                查看和管理学习模板及模块
+            </p>
+            <a href="{% url 'template_management' %}" class="btn btn-primary" style="text-decoration: none;">
+                <i data-lucide="clipboard-list" size="18" style="margin-right: 8px;"></i>
+                进入模板管理
+            </a>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 12px;">
+                创建、编辑和删除学习模板及模块
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 暗夜模式初始化
+        const root = document.documentElement;
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        
+        // 检查本地存储或系统偏好
+        const isDarkMode = localStorage.getItem('darkMode') === 'true' || 
+                         (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && 
+                          localStorage.getItem('darkMode') === null);
+        
+        // 设置初始模式
+        if (isDarkMode) {
+            root.classList.add('dark');
+        }
+        
+        // 切换按钮点击事件
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', function() {
+                root.classList.toggle('dark');
+                
+                // 保存设置到本地存储
+                const isDark = root.classList.contains('dark');
+                localStorage.setItem('darkMode', isDark);
+                
+                // 更新图标
+                updateDarkModeIcon();
+            });
+            
+            // 更新图标函数
+            function updateDarkModeIcon() {
+                const icon = darkModeToggle.querySelector('i');
+                if (icon) {
+                    if (root.classList.contains('dark')) {
+                        icon.setAttribute('data-lucide', 'moon');
+                    } else {
+                        icon.setAttribute('data-lucide', 'sun');
+                    }
+                    // 重新渲染图标
+                    lucide.createIcons();
+                }
+            }
+            
+            // 初始更新图标
+            updateDarkModeIcon();
+        }
+        
+        lucide.createIcons();
+    </script>
+</body>
+</html>

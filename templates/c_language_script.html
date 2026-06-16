@@ -1,0 +1,96 @@
+// C语言语法数据
+const syntaxData = [
+    { syntax: "变量声明", meaning: "用于声明程序中使用的变量，指定变量的类型和名称" },
+    { syntax: "条件语句", meaning: "根据条件执行不同的代码块，包括if、else if、else、switch等" },
+    { syntax: "循环语句", meaning: "重复执行一段代码，包括for、while、do-while等" },
+    { syntax: "函数定义", meaning: "定义可重用的代码块，包括函数名、参数列表和返回类型" },
+    { syntax: "数组", meaning: "用于存储多个相同类型的数据，包括一维数组和多维数组" },
+    { syntax: "指针", meaning: "指向内存地址的变量，可以用于间接访问和修改内存中的数据" },
+    { syntax: "结构体", meaning: "用于组合不同类型的数据，形成新的数据类型" },
+    { syntax: "动态内存", meaning: "在程序运行时分配和释放内存，包括malloc、calloc、realloc、free等函数" },
+    { syntax: "文件操作", meaning: "用于读写外部文件，包括fopen、fclose、fread、fwrite等函数" },
+    { syntax: "字符串处理", meaning: "用于处理字符数组，包括strcpy、strlen、strcmp等函数" }
+];
+
+let currentSyntaxIndex = -1;
+let showingMeaning = false;
+
+// 随机抽查功能
+const randomCheckBtn = document.getElementById('random-check-btn');
+const randomCheckArea = document.getElementById('random-check-area');
+const randomSyntax = document.getElementById('random-syntax');
+const randomSyntaxMeaning = document.getElementById('random-syntax-meaning');
+const showMeaningBtn = document.getElementById('show-meaning-btn');
+const nextSyntaxBtn = document.getElementById('next-syntax-btn');
+const knownBtn = document.getElementById('known-btn');
+
+if (randomCheckBtn) {
+    randomCheckBtn.addEventListener('click', () => {
+        randomCheckArea.style.display = 'block';
+        showNextRandomSyntax();
+    });
+}
+
+const showNextRandomSyntax = () => {
+    currentSyntaxIndex = Math.floor(Math.random() * syntaxData.length);
+    randomSyntax.textContent = syntaxData[currentSyntaxIndex].syntax;
+    randomSyntaxMeaning.textContent = '点击"显示释义"查看释义';
+    showingMeaning = false;
+};
+
+if (showMeaningBtn) {
+    showMeaningBtn.addEventListener('click', () => {
+        if (!showingMeaning) {
+            randomSyntaxMeaning.textContent = syntaxData[currentSyntaxIndex].meaning;
+            showingMeaning = true;
+        }
+    });
+}
+
+if (nextSyntaxBtn) {
+    nextSyntaxBtn.addEventListener('click', () => {
+        showNextRandomSyntax();
+    });
+}
+
+if (knownBtn) {
+    knownBtn.addEventListener('click', () => {
+        // 这里可以添加已掌握语法点的处理逻辑
+        alert('已标记为掌握！');
+        showNextRandomSyntax();
+    });
+}
+
+// 语法搜索功能
+const searchBtn = document.getElementById('search-btn');
+const syntaxSearch = document.getElementById('syntax-search');
+
+const searchSyntax = () => {
+    const query = syntaxSearch.value.trim().toLowerCase();
+    if (!query) {
+        return;
+    }
+
+    const results = syntaxData.filter(item => 
+        item.syntax.toLowerCase().includes(query) || 
+        item.meaning.toLowerCase().includes(query)
+    );
+
+    if (results.length > 0) {
+        alert(`找到 ${results.length} 个相关语法点：\n${results.map(r => `${r.syntax}: ${r.meaning}`).join('\n')}`);
+    } else {
+        alert('未找到匹配的语法点');
+    }
+};
+
+if (searchBtn) {
+    searchBtn.addEventListener('click', searchSyntax);
+}
+
+if (syntaxSearch) {
+    syntaxSearch.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            searchSyntax();
+        }
+    });
+}

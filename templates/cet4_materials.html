@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CET-4学习资料 - StudyFlow</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 复用首页样式 */
+        :root {
+            --bg-main: #F8FAFB;
+            --card-bg: #FFFFFF;
+            --mint: #81C784;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --border: #EDF2F7;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, "Noto Sans SC", sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        nav {
+            height: 64px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .container {
+            flex-grow: 1;
+            padding: 24px 40px;
+            overflow: hidden;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .back-button:hover {
+            background: #F7FAFC;
+        }
+
+        .main-content {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 32px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            min-height: calc(100vh - 180px);
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* 学习资料标题 */
+        .materials-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .materials-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        /* 学习资料内容 */
+        .materials-content {
+            background: #F7FAFC;
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+        }
+
+        .content-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        /* 词汇列表区域 */
+        .materials-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* 通用学习资料样式 */
+        .study-material {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .materials-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'home' %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 10px; font-weight: bold; color: var(--mint); font-size: 1.2rem;">
+                <i data-lucide="leaf"></i> StudyFlow
+            </div>
+        </a>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: var(--text-primary);">首页</a>
+            <a href="{% url 'cet4_study' %}" class="btn btn-secondary">
+                <i data-lucide="book-open" size="16"></i>
+                返回学习
+            </a>
+            <a href="{% url 'logout' %}" style="background: #E2E8F0; padding: 8px 16px; border-radius: 8px; text-decoration: none; color: var(--text-primary); font-size: 0.9rem;">退出登录</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- 返回按钮 -->
+            <a href="{% url 'cet4_study' current_module.name %}" class="back-button">
+                <i data-lucide="arrow-left" size="16"></i>
+                返回{{ current_module.name }}学习
+            </a>
+
+            <!-- 学习资料标题 -->
+            <div class="materials-header">
+                <div style="width: 40px; height: 40px; background: var(--mint); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                    <i data-lucide="book-open" size="24"></i>
+                </div>
+                <h1 class="materials-title">CET-4 {{ current_module.name }}学习资料</h1>
+            </div>
+
+            <!-- 学习资料内容 -->
+            <div class="study-material">
+                {% if current_module.name == '语法' %}
+                    <div class="content-section">
+                        <h3 class="section-title">虚拟语气</h3>
+                        <p style="margin: 0 0 15px; color: var(--text-primary);">
+                            虚拟语气是英语四级考试中的重要语法点，主要用于表达假设、愿望、建议等非真实情况。
+                        </p>
+                        <h4 style="margin: 15px 0 10px 0; color: var(--text-primary);">基本结构：</h4>
+                        <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+                            <li>与现在事实相反：if + 过去式，would + 动词原形</li>
+                            <li>与过去事实相反：if + had + 过去分词，would + have + 过去分词</li>
+                            <li>与将来事实相反：if + 过去式/were to do/should do，would + 动词原形</li>
+                        </ul>
+                        <p style="margin: 15px 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+                            建议每天练习20道虚拟语气相关题目，熟悉各种时态的用法。
+                        </p>
+                    </div>
+
+                    <div class="content-section">
+                        <h3 class="section-title">时态</h3>
+                        <p style="margin: 0 0 15px; color: var(--text-primary);">
+                            英语四级考试中常见的时态包括：一般现在时、一般过去时、一般将来时、现在进行时、过去进行时、现在完成时和过去完成时。
+                        </p>
+                        <h4 style="margin: 15px 0 10px 0; color: var(--text-primary);">重点时态用法：</h4>
+                        <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+                            <li>现在完成时：表示过去发生的动作对现在造成的影响或结果</li>
+                            <li>过去完成时：表示在过去某一时间或动作之前已经发生或完成的动作</li>
+                            <li>现在进行时：表示现在正在进行的动作或现阶段正在进行的动作</li>
+                        </ul>
+                    </div>
+                {% elif current_module.name == '听力' %}
+                    <div class="content-section">
+                        <h3 class="section-title">听力技巧</h3>
+                        <p style="margin: 0 0 15px; color: var(--text-primary);">
+                            英语四级听力考试包括短对话、长对话和听力篇章三部分，总分为248.5分。
+                        </p>
+                        <h4 style="margin: 15px 0 10px 0; color: var(--text-primary);">备考建议：</h4>
+                        <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+                            <li>每天坚持听30分钟英语材料</li>
+                            <li>练习速记关键词汇和数字</li>
+                            <li>熟悉听力考试题型和出题规律</li>
+                            <li>模拟真实考试环境进行练习</li>
+                        </ul>
+                    </div>
+                {% elif current_module.name == '阅读' %}
+                    <div class="content-section">
+                        <h3 class="section-title">阅读技巧</h3>
+                        <p style="margin: 0 0 15px; color: var(--text-primary);">
+                            英语四级阅读考试包括选词填空、长篇阅读和仔细阅读三部分，总分为248.5分。
+                        </p>
+                        <h4 style="margin: 15px 0 10px 0; color: var(--text-primary);">备考建议：</h4>
+                        <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+                            <li>提高阅读速度，每天阅读至少4篇文章</li>
+                            <li>掌握各种题型的解题方法</li>
+                            <li>积累高频词汇和短语</li>
+                            <li>学会快速定位关键信息</li>
+                        </ul>
+                    </div>
+                {% elif current_module.name == '写作' %}
+                    <div class="content-section">
+                        <h3 class="section-title">写作模板</h3>
+                        <p style="margin: 0 0 15px; color: var(--text-primary);">
+                            英语四级写作考试要求考生根据提示写出一篇不少于120词的短文，总分为106.5分。
+                        </p>
+                        <h4 style="margin: 15px 0 10px 0; color: var(--text-primary);">开头模板：</h4>
+                        <p style="margin: 0 0 15px; padding: 10px; background: #F7FAFC; border-radius: 8px; color: var(--text-primary);">
+                            With the rapid development of society, more and more people are paying attention to...
+                        </p>
+                        <h4 style="margin: 15px 0 10px 0; color: var(--text-primary);">结尾模板：</h4>
+                        <p style="margin: 0; padding: 10px; background: #F7FAFC; border-radius: 8px; color: var(--text-primary);">
+                            In conclusion, I believe that... Therefore, it is time for us to take actions to...
+                        </p>
+                    </div>
+                {% elif current_module.name == '翻译' %}
+                    <div class="content-section">
+                        <h3 class="section-title">翻译技巧</h3>
+                        <p style="margin: 0 0 15px; color: var(--text-primary);">
+                            英语四级翻译考试要求考生将一段中文翻译成英文，总分为106.5分。
+                        </p>
+                        <h4 style="margin: 15px 0 10px 0; color: var(--text-primary);">备考建议：</h4>
+                        <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+                            <li>积累常用词汇和短语</li>
+                            <li>掌握各种句型的翻译方法</li>
+                            <li>注意时态和语态的正确使用</li>
+                            <li>每天练习翻译1-2篇短文</li>
+                        </ul>
+                        <h4 style="margin: 15px 0 10px 0; color: var(--text-primary);">示例：</h4>
+                        <p style="margin: 0; padding: 10px; background: #F7FAFC; border-radius: 8px; color: var(--text-primary);">
+                            原文：中国是世界上人口最多的国家。<br>
+                            译文：China is the most populous country in the world.
+                        </p>
+                    </div>
+                {% else %}
+                    <div class="content-section">
+                        <h3 class="section-title">学习资料</h3>
+                        <p style="color: var(--text-secondary);">
+                            该模块的学习资料正在整理中，敬请期待...
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

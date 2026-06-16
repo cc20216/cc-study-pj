@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>StudyFlow - 极简学习空间</title>
+    <script src="https://unpkg.com/lucide@0.284.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        
+        :root {
+            --bg-main: #F8FAFB;
+            --card-bg: #FFFFFF;
+            --mint: #81C784;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --border: #EDF2F7;
+        }
+
+        /* 暗夜模式变量 */
+        :root.dark {
+            --bg-main: #1A202C;
+            --card-bg: #2D3748;
+            --mint: #81C784;
+            --text-primary: #F7FAFC;
+            --text-secondary: #A0AEC0;
+            --border: #4A5568;
+        }
+        
+        /* 全局box-sizing设置 */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        /* 确保按钮颜色在暗夜模式下依然清晰可见 */
+        :root.dark .btn-green {
+            background: #2E7D32;
+            color: white;
+        }
+
+        :root.dark .btn-blue {
+            background: #1565C0;
+            color: white;
+        }
+
+        :root.dark .btn-purple {
+            background: #6A1B9A;
+            color: white;
+        }
+
+        :root.dark .btn-pink {
+            background: #AD1457;
+            color: white;
+        }
+
+        /* 确保卡片边框在暗夜模式下清晰可见 */
+        :root.dark .card {
+            border: 1px solid var(--border);
+        }
+
+        /* 确保输入框在暗夜模式下清晰可见 */
+        :root.dark input[type="text"],
+        :root.dark textarea {
+            background: #4A5568;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        /* 确保链接在暗夜模式下清晰可见 */
+        :root.dark a {
+            color: var(--mint);
+        }
+
+        /* 确保任务项在暗夜模式下清晰可见 */
+        :root.dark .todo-item {
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* 确保玩偶区域在暗夜模式下清晰可见 */
+        :root.dark .doll-box {
+            background: linear-gradient(180deg, #2D3748 0%, #27272A 100%);
+        }
+
+        /* 确保进度条在暗夜模式下清晰可见 */
+        :root.dark .pg-track {
+            background: #4A5568;
+        }
+
+        /* 确保AI按钮在暗夜模式下清晰可见 */
+        :root.dark .btn-purple {
+            background: #6366f1;
+            color: white;
+        }
+
+        /* 确保其他按钮在暗夜模式下清晰可见 */
+        :root.dark .btn-secondary {
+            background: #4A5568;
+            color: var(--text-primary);
+        }
+
+        /* 确保所有元素在暗夜模式下正确显示 */
+        :root.dark {
+            /* 强制所有文本元素使用白色文字 */
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            p,
+            span,
+            div,
+            select,
+            option,
+            li,
+            i,
+            label {
+                color: white !important;
+            }
+
+            /* 强制所有卡片和容器使用深色背景，白色边框和适当模糊效果 */
+            .card,
+            .todo-list,
+            .template-box,
+            .chat-main,
+            .chat-input-area,
+            .chat-list,
+            form > div,
+            .card[style*="background: linear-gradient"],
+            div[style*="background: white"],
+            div[style*="background-color: white"],
+            div[style*="background: #FFF"],
+            div[style*="background: #ffffff"],
+            div[style*="background: #F7FAFC"],
+            div[style*="background: rgba(255, 255, 255, 0.95)"],
+            label[style*="background: white"],
+            label[style*="background-color: white"],
+            label[style*="background: #FFF"],
+            label[style*="background: #ffffff"] {
+                background-color: var(--card-bg) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+            }
+
+            /* 强制所有输入框、表单元素和图表使用深色背景和白色文字 */
+            input[type="text"],
+            textarea,
+            select,
+            canvas {
+                background-color: var(--card-bg) !important;
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.3) !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+            }
+
+            /* 强制所有按钮文字为白色，添加白色边框 */
+            button {
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+
+            /* 修复特定元素的样式 */
+            .todo-item {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            }
+
+            /* 修复模板盒子的样式 */
+            .template-box {
+                background-color: var(--card-bg) !important;
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+            }
+
+            .template-box.selected {
+                background-color: rgba(129, 199, 132, 0.2) !important;
+                border: 1px solid rgba(255, 255, 255, 0.3) !important;
+                box-shadow: 0 4px 16px rgba(129, 199, 132, 0.3) !important;
+            }
+
+            /* 修复卡片的背景渐变 */
+            .card[style*="background: linear-gradient"] {
+                background: var(--card-bg) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+
+            /* 修复图表样式 */
+            .chart-container {
+                background-color: var(--card-bg) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+            }
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, "Noto Sans SC", sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav {
+            height: 56px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 200px 1fr 260px;
+            gap: 14px;
+            padding: 14px;
+            flex-grow: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-sizing: border-box;
+            height: calc(100vh - 56px);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        
+        /* 右侧边栏样式调整 */
+        aside:last-child {
+            padding-right: 5px;
+        }
+
+        /* 任务列表样式 */
+        .todo-list { list-style: none; padding: 0; margin: 0; }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #F9FAFB;
+            transition: all 0.3s ease;
+        }
+        /* 任务项悬停效果 */
+        .todo-item:hover {
+            background: rgba(249, 250, 251, 0.8) !important;
+            transform: translateX(4px);
+        }
+        /* 悬停时显示删除按钮 */
+        .todo-item:hover form:last-child {
+            opacity: 0.8;
+            transform: scale(1);
+        }
+        /* 删除按钮默认样式 */
+        .todo-item form:last-child button {
+            background: rgba(229, 62, 62, 0.08) !important;
+            border: 1px solid rgba(229, 62, 62, 0.2) !important;
+            color: #EF4444 !important;
+        }
+        /* 删除按钮悬停效果 */
+        .todo-item form:last-child button:hover {
+            opacity: 1 !important;
+            background: rgba(229, 62, 62, 0.15) !important;
+            border-color: rgba(229, 62, 62, 0.4) !important;
+            color: #DC2626 !important;
+            transform: scale(1.05);
+        }
+        .todo-item:last-child { border-bottom: none; }
+        .todo-content { font-size: 0.9rem; margin-left: 10px; }
+        .done { color: #BDC3C7; text-decoration: line-through; }
+
+        /* 核心按钮 */
+        .action-btn {
+            height: 105px;
+            border-radius: 16px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .btn-green { background: #E8F5E9; color: #2E7D32; }
+        .btn-blue { background: #E3F2FD; color: #1565C0; }
+        .btn-purple { background: #F3E5F5; color: #6A1B9A; }
+        .btn-pink { background: #FCE4EC; color: #C2185B; }
+        .action-btn:hover { transform: translateY(-4px); }
+
+        /* 玩偶区域 */
+        .doll-box { text-align: center; background: linear-gradient(180deg, #FFFFFF 0%, #F1F8E9 100%); cursor: pointer; transition: all 0.3s ease; }
+        .doll-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        .doll-icon {
+            margin: 14px 0;
+            display: inline-block;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        /* 悬停效果：放大并增加阴影 */
+        .doll-icon:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 4px 12px rgba(129, 199, 132, 0.3));
+        }
+        
+        /* 达标状态：彩色动态 */
+        .doll-icon.active {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-15px) rotate(3deg); }
+            50% { transform: translateY(-5px) rotate(0deg); }
+            75% { transform: translateY(-15px) rotate(-3deg); }
+        }
+        
+        /* 未达标状态：灰色垂头 */
+        .doll-icon.inactive {
+            filter: grayscale(100%);
+            animation: droop 0.5s ease-in-out forwards;
+        }
+        
+        @keyframes droop {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(8px) rotate(-12deg); }
+        }
+        
+        /* 玩偶颜色过渡 */
+        .doll-icon i, .doll-icon img {
+            transition: all 0.3s ease;
+        }
+        
+        .doll-icon.inactive i {
+            filter: grayscale(100%);
+            color: #CCC !important;
+        }
+        
+        /* 自定义图片的未达标状态 */
+        .doll-icon.inactive img {
+            filter: grayscale(100%);
+            opacity: 0.7;
+        }
+        
+        /* 点击效果 */
+        .doll-icon:active {
+            transform: scale(0.95);
+        }
+        
+        /* 添加点击提示 */
+        .doll-box::after {
+            content: "点击我试试~";
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .doll-box:hover::after {
+            opacity: 0.7;
+        }
+
+        /* 进度条 */
+        .pg-track { height: 6px; background: #EEE; border-radius: 3px; margin: 8px 0 16px; overflow: hidden; }
+        .pg-bar { height: 100%; border-radius: 3px; transition: width 1s ease-in-out; }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 200px 1fr 240px;
+                gap: 14px;
+                padding: 14px;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 14px;
+                gap: 14px;
+            }
+            
+            nav {
+                padding: 0 14px;
+            }
+            
+            /* 调整任务清单卡片高度 */
+            aside.card {
+                order: 2;
+            }
+            
+            /* 调整功能区顺序 */
+            main {
+                order: 1;
+            }
+            
+            /* 调整右侧边栏顺序 */
+            aside:last-child {
+                order: 3;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                gap: 10px;
+            }
+            
+            nav {
+                padding: 0 10px;
+            }
+            
+            /* 任务管理表单 */
+            form input[type="text"] {
+                padding: 6px 10px !important;
+                font-size: 0.8rem !important;
+            }
+            
+            /* 学习模板入口卡片 */
+            .card:nth-child(3) a {
+                min-width: 160px !important;
+                padding: 12px !important;
+            }
+            
+            /* 功能按钮 */
+            .action-btn {
+                height: 90px !important;
+                font-size: 0.9rem !important;
+            }
+            
+            /* 玩偶区域 */
+            .doll-box {
+                padding: 12px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+                <div style="display: flex; align-items: center; gap: 10px; font-weight: bold; color: var(--mint); font-size: 1.1rem;">
+                    <i data-lucide="leaf"></i> StudyFlow
+                </div>
+            </a>
+            <button id="dark-mode-toggle" style="background: transparent; border: none; cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; color: var(--text-primary);">
+                <i data-lucide="moon" size="20"></i>
+            </button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <span style="font-size: 0.9rem; color: var(--text-secondary);">{{ today_date }}</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-weight: 500;">{{ user_info.nickname }}</span>,
+                <a href="{% url 'profile' %}" style="width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; overflow: hidden; border: 2px solid var(--mint);">
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="{{ user_info.nickname }}的头像" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        <i data-lucide="user" size="18" color="#4CAF50"></i>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 左侧：任务清单 -->
+        <aside class="card">
+            <h3 style="margin: 0 0 14px 0; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="clipboard-list" size="16"></i> 今日任务
+            </h3>
+            
+            <!-- 添加任务表单 -->
+            <form method="POST" action="{% url 'add_todo' %}" style="margin-bottom: 14px;" onsubmit="return validateTodoForm()">
+                {% csrf_token %}
+                <div style="display: flex; align-items: center; gap: 8px; background: white; padding: 8px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); box-sizing: border-box;">
+                    <input type="text" 
+                           id="todo_content" 
+                           name="content" 
+                           placeholder="添加新任务..." 
+                           style="flex: 1; padding: 6px 10px; border: 1px solid var(--border); border-radius: 12px; font-size: 0.8rem; background: var(--bg-main); outline: none; transition: all 0.3s ease; box-sizing: border-box; height: 32px;">
+                    <button type="submit" 
+                            style="background: var(--mint); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(129, 199, 132, 0.3); margin-left: -4px; z-index: 1;">
+                        <i data-lucide="plus" size="14"></i>
+                    </button>
+                </div>
+                <div id="todo_error" style="color: #E53E3E; font-size: 0.85rem; margin-top: 8px; margin-left: 12px; display: none;">
+                    <i data-lucide="alert-circle" size="14" style="vertical-align: middle; margin-right: 4px;"></i>
+                    请输入任务内容
+                </div>
+            </form>
+
+            <script>
+                function validateTodoForm() {
+                    const contentInput = document.getElementById('todo_content');
+                    const errorDiv = document.getElementById('todo_error');
+                    const lucideIcons = document.querySelectorAll('[data-lucide]');
+                    
+                    // 检查输入内容是否为空
+                    if (!contentInput.value.trim()) {
+                        // 显示错误信息
+                        errorDiv.style.display = 'block';
+                        // 高亮输入框
+                        contentInput.style.borderColor = '#E53E3E';
+                        contentInput.style.boxShadow = '0 0 0 2px rgba(229, 62, 62, 0.1)';
+                        // 聚焦输入框
+                        contentInput.focus();
+                        // 刷新图标
+                        lucide.createIcons();
+                        return false; // 阻止表单提交
+                    }
+                    
+                    // 隐藏错误信息
+                    errorDiv.style.display = 'none';
+                    // 恢复输入框样式
+                    contentInput.style.borderColor = '';
+                    contentInput.style.boxShadow = '';
+                    return true; // 允许表单提交
+                }
+                
+                // 当输入框获得焦点时，隐藏错误信息
+                document.getElementById('todo_content').addEventListener('focus', function() {
+                    const errorDiv = document.getElementById('todo_error');
+                    errorDiv.style.display = 'none';
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                });
+            </script>
+            
+            <!-- 任务列表 -->
+            <ul class="todo-list" style="padding: 0; margin: 0; list-style: none; background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                {% if todo_list %}
+                    {% for item in todo_list %}
+                    <li class="todo-item" style="display: flex; align-items: center; padding: 16px 20px; transition: all 0.3s ease; border-bottom: 1px solid #F1F5F9; background: transparent;">
+                        <!-- 任务状态切换 -->
+                        <form method="POST" action="{% url 'toggle_todo' item.id %}" style="margin: 0; padding: 0; margin-right: 12px; flex-shrink: 0;">
+                            {% csrf_token %}
+                            <button type="submit" 
+                                    style="background: none; border: none; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; border-radius: 50%;">
+                                <i data-lucide="{% if item.is_done %}check-circle{% else %}circle{% endif %}"
+                                   size="20"
+                                   color="{% if item.is_done %}#81C784{% else %}#94A3B8{% endif %}"></i>
+                            </button>
+                        </form>
+                        
+                        <!-- 任务内容 -->
+                        <span class="todo-content {% if item.is_done %}done{% endif %}" style="flex: 1; font-size: 0.95rem; color: var(--text-primary); line-height: 1.5; transition: all 0.3s ease;">
+                            {{ item.content }}
+                        </span>
+                        
+                        <!-- 删除任务按钮 -->
+                    <form method="POST" action="{% url 'delete_todo' item.id %}" style="margin: 0; padding: 0; opacity: 0; transition: all 0.3s ease; flex-shrink: 0; transform: scale(0.9);">
+                        {% csrf_token %}
+                        <button type="submit" 
+                                style="background: rgba(229, 62, 62, 0.08); border: 1px solid rgba(229, 62, 62, 0.2); padding: 8px; cursor: pointer; color: #EF4444; border-radius: 50%; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="trash-2" size="14"></i>
+                        </button>
+                    </form>
+                    </li>
+                    {% endfor %}
+                {% else %}
+                    <li style="text-align: center; color: #94A3B8; padding: 40px 20px; font-size: 0.95rem;">
+                        <i data-lucide="clipboard-list" size="32" style="display: block; margin: 0 auto 16px; opacity: 0.5;"></i>
+                        暂无任务，添加一个开始吧
+                    </li>
+                {% endif %}
+            </ul>
+        </aside>
+
+        <!-- 中间：功能区 -->
+        <main style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="card" style="background: linear-gradient(90deg, #FFFFFF 0%, #F8FBFF 100%); padding: 14px 16px;">
+                <h2 style="margin: 0; font-size: 1.1rem;">{{ greeting }}，{{ user_info.nickname }}</h2>
+                <p style="color: var(--text-secondary); margin: 6px 0 0; font-size: 0.9rem;">“{{ motto }}”</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <a href="{% url 'study_session' %}" id="home-study-session" class="action-btn btn-green" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-decoration: none;">
+                    <i data-lucide="clock" size="28"></i>
+                    开始沉浸学习
+                </a>
+                <a href="{% url 'progress_dashboard' %}" id="home-progress-dashboard" class="action-btn btn-blue" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-decoration: none;">
+                    <i data-lucide="pie-chart" size="28"></i>
+                    查看进度看板
+                </a>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <a href="{% url 'ai_chat' %}" id="home-ai-qa" class="action-btn btn-purple" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-decoration: none;">
+                    <i data-lucide="message-circle-question" size="28"></i>
+                    AI问答
+                </a>
+                <a href="{% url 'daily_progress' %}" id="home-daily-progress" class="action-btn btn-pink" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-decoration: none;">
+                    <i data-lucide="pencil" size="28"></i>
+                    填写今日进度
+                </a>
+            </div>
+
+            <!-- 学习模板入口 -->
+            <div class="card" style="margin-top: 0;">
+                <h3 style="margin: 0 0 12px 0; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="book-open" size="16"></i> 学习模板
+                    <span style="font-size: 0.7rem; color: #94A3B8; font-weight: normal;">(拖拽调整顺序)</span>
+                </h3>
+                
+                <!-- 模板滑动容器 -->
+                <div style="position: relative; display: flex; align-items: center; width: 100%; box-sizing: border-box;">
+                    <!-- 模板容器 - 仅包含模板，不包含设置按钮 -->
+                        <div id="templates-container" 
+                             style="display: flex; gap: 12px; overflow-x: auto; min-height: 120px; scrollbar-width: none; -ms-overflow-style: none; width: 100%; overflow: hidden;">
+                        <!-- 隐藏滚动条 -->
+                        <style>
+                            #templates-container::-webkit-scrollbar { display: none; }
+                            #templates-container { scroll-snap-type: x mandatory; }
+                            .template-box { scroll-snap-align: start; }
+                        </style>
+                        
+                        <!-- 动态显示所有模板 -->
+                        {% for template in templates %}
+                            <!-- 当前选中模板高亮显示 -->
+                            <div draggable="true" 
+                                 data-template-id="{{ template.id }}"
+                                 data-template-name="{{ template.name }}"
+                                 ondragstart="dragStart(event)"
+                                 ondragover="dragOver(event)"
+                                 ondrop="drop(event)"
+                                 onclick="selectTemplate(this)"
+                                 ondblclick="window.location.href='{% url "study_base" template.id %}'"
+                                 class="template-box {% if template.id|stringformat:'s' == selected_template_id|stringformat:'s' %}selected{% endif %}"
+                                 style="width: 180px; background: {% if template.id|stringformat:'s' == selected_template_id|stringformat:'s' %}#E8F5E9{% else %}#F5F7FA{% endif %}; padding: 14px; border-radius: 12px; cursor: grab; color: {% if template.id|stringformat:'s' == selected_template_id|stringformat:'s' %}#2E7D32{% else %}var(--text-primary){% endif %}; transition: transform 0.2s, box-shadow 0.2s; user-select: none; flex-shrink: 0; flex-grow: 0;"
+                                 title="单击选择，双击进入详细页面，拖拽调整顺序">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <i data-lucide="grip-vertical" size="20" style="color: #94A3B8; cursor: grab;"></i>
+                                    <i data-lucide="graduation-cap" size="24"></i>
+                                    <h4 style="margin: 0; font-size: 1.1rem;">{{ template.name }}</h4>
+                                </div>
+                                <p style="margin: 0; font-size: 0.85rem; color: {% if template.id|stringformat:'s' == selected_template_id|stringformat:'s' %}#43A047{% else %}#7F8C8D{% endif %}; line-height: 1.4;">
+                                    {{ template.description|default:"开始学习这个模板吧" }}
+                                </p>
+                                <div style="margin-top: 8px; font-size: 0.75rem; color: #94A3B8;">
+                                    单击选择 | 双击进入
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- 左侧滑动按钮 - 在模块滑动容器内左侧悬浮 -->
+                    <button id="prev-btn" 
+                            onclick="slideTemplates(-1)"
+                            style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: var(--mint); border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.1); z-index: 10; transition: all 0.2s ease; color: white; flex-shrink: 0;">
+                        <i data-lucide="chevron-left" size="16" style="color: white;"></i>
+                    </button>
+                    
+                    <!-- 右侧滑动按钮 - 在模块滑动容器内右侧悬浮，设置按钮左侧 -->
+                    <button id="next-btn" 
+                            onclick="slideTemplates(1)"
+                            style="position: absolute; right: 90px; top: 50%; transform: translateY(-50%); background: var(--mint); border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.1); z-index: 10; transition: all 0.2s ease; color: white; flex-shrink: 0;">
+                        <i data-lucide="chevron-right" size="16" style="color: white;"></i>
+                    </button>
+                    
+                    <!-- 管理模板按钮 - 位于模块滑动容器右侧外部，固定位置 -->
+                    <a href="{% url 'template_management' %}" id="home-template-management" 
+                       style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 45px; background: var(--mint); padding: 10px; border-radius: 12px; text-decoration: none; color: white; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                        <i data-lucide="settings" size="22"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 统计数据卡片 -->
+            <div class="card" style="display: flex; justify-content: space-around; padding: 16px; margin-top: 0;">
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5rem; font-weight: bold;">{{ user_info.total_hours|floatformat:1 }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary);">累计时长 (h)</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--mint);">{{ user_info.streak_days }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary);">连续天数</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #1E88E5;">{{ plan.percent }}%</div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary);">总进度</div>
+                </div>
+            </div>
+
+            <!-- 学习热力图 -->
+            <div class="card" id="heatmap-card" style="padding: 14px;">
+                <h3 style="margin: 0 0 10px 0; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="calendar-heart" size="16"></i> 学习热力图
+                    <span style="font-size: 0.7rem; color: var(--text-secondary); font-weight: normal; margin-left: auto;">最近12周</span>
+                </h3>
+                <div id="heatmap-container" style="position: relative; display: flex; justify-content: center; overflow-x: auto;">
+                    <div id="heatmap-grid" style="display: flex; gap: 3px; min-height: 80px; align-items: center; justify-content: center;">
+                        <div style="color: var(--text-secondary); font-size: 0.7rem; display: flex; align-items: center; justify-content: center; padding: 0 8px;">
+                            <i data-lucide="loader-2" size="16" class="spinner"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="heatmap-legend" style="display: flex; justify-content: center; align-items: center; gap: 3px; margin-top: 8px; font-size: 0.65rem; color: var(--text-secondary);">
+                    <span>少</span>
+                    <div style="width: 10px; height: 10px; border-radius: 2px; background: #ebedf0;"></div>
+                    <div style="width: 10px; height: 10px; border-radius: 2px; background: #9be9a8;"></div>
+                    <div style="width: 10px; height: 10px; border-radius: 2px; background: #40c463;"></div>
+                    <div style="width: 10px; height: 10px; border-radius: 2px; background: #30a14e;"></div>
+                    <div style="width: 10px; height: 10px; border-radius: 2px; background: #216e39;"></div>
+                    <span>多</span>
+                </div>
+            </div>
+
+            <style>
+                .heatmap-cell {
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    transition: transform 0.15s;
+                }
+                .heatmap-cell:hover {
+                    transform: scale(1.5);
+                    z-index: 10;
+                }
+                .heatmap-level-0 { background: #ebedf0; }
+                .heatmap-level-1 { background: #9be9a8; }
+                .heatmap-level-2 { background: #40c463; }
+                .heatmap-level-3 { background: #30a14e; }
+                .heatmap-level-4 { background: #216e39; }
+                
+                :root.dark .heatmap-level-0 { background: #2d333b; }
+                :root.dark .heatmap-legend .heatmap-level-0 { background: #2d333b; }
+                
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+                .spinner {
+                    animation: spin 1s linear infinite;
+                }
+            </style>
+        </main>
+
+        <!-- 右侧：玩偶与计划详情 -->
+        <aside style="display: flex; flex-direction: column; gap: 14px; height: 100%;">
+            <div class="card doll-box" style="margin-right: 5px; padding: 14px;">
+                <div style="font-size: 0.7rem; background: #FFF; display: inline-block; padding: 2px 8px; border-radius: 8px; color: var(--mint); border: 1px solid var(--mint);">
+                    {{ doll.status_text }}
+                </div>
+                <div class="doll-icon {% if doll.is_active %}active{% else %}inactive{% endif %}">
+                {% if profile.doll_image %}
+                    <img src="{{ profile.doll_image.url }}" alt="自定义玩偶" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%;">
+                {% else %}
+                    <i data-lucide="smile" size="60" color="{% if doll.is_active %}#81C784{% else %}#CCC{% endif %}"></i>
+                {% endif %}
+            </div>
+                <div style="background: white; padding: 10px; border-radius: 10px; font-size: 0.8rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    {{ doll.message }}
+                </div>
+            </div>
+
+            <div class="card" style="display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; max-height: calc(100vh - 220px); margin-right: 5px; padding: 14px;">
+                <!-- 模板选择器 -->
+                <div style="margin-bottom: 15px;">
+                    <form method="GET" action="" style="margin: 0;">
+                        <select name="template_id" onchange="this.form.submit()" style="width: 100%; padding: 8px; border: 1px solid #EDF2F7; border-radius: 8px; background: white; font-size: 0.85rem; margin-bottom: 10px;">
+                            {% for template in templates %}
+                                <option value="{{ template.id }}" {% if template.id|stringformat:'s' == selected_template_id|stringformat:'s' %}selected{% endif %}>
+                                    {{ template.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+                
+                <!-- 当前模板信息 -->
+                <h4 style="margin: 0 0 5px 0;">{{ plan.name }}</h4>
+                
+                <!-- 模块进度区域 - 设置固定高度（显示6条模块）和滚动条 -->
+                <div class="modules-container" style="height: 280px; overflow-y: auto; margin-bottom: 10px; padding-right: 8px;">
+                    {% for module in plan.modules %}
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                            <span>{{ module.name }}</span>
+                            <span>{{ module.percent }}%</span>
+                        </div>
+                        <div class="pg-track">
+                            <div class="pg-bar" style="width: {{ module.percent }}%; background: {{ module.color }};"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- 轮播图表区域 -->
+                <div style="margin-top: 8px; margin-right: 5px; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--card-bg);">
+                    <!-- 轮播容器 -->
+                    <div id="progress-carousel" style="position: relative; height: 200px;">
+                        <!-- 轮播幻灯片 -->
+                        <div class="carousel-slide active" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: all 0.5s ease;">
+                            <div style="padding: 16px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column;">
+                                <h5 style="margin: 0 0 12px 0; font-size: 0.9rem; color: var(--text-secondary);">📊 每日学习时间</h5>
+                                <canvas id="daily-study-time-chart" style="width: 100%; height: calc(100% - 30px); min-height: 150px;"></canvas>
+                            </div>
+                        </div>
+                        <div class="carousel-slide" style="position: absolute; top: 0; left: 100%; width: 100%; height: 100%; transition: all 0.5s ease;">
+                            <div style="padding: 16px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column;">
+                                <h5 style="margin: 0 0 12px 0; font-size: 0.9rem; color: var(--text-secondary);">📈 {{ plan.name }} 模块进度</h5>
+                                <canvas id="module-progress-chart" style="width: 100%; height: calc(100% - 30px); min-height: 150px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <script>
+                    // 确保DOM加载完成后执行
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // 1. 获取所有模板的模块数据
+                        const allTemplatesData = {{ templates_with_modules_json|safe }};
+                        const templates = {{ templates_json|safe }};
+                        
+                        // 2. 准备每日学习时间数据
+                        const dailyStudyTimeData = {
+                            labels: {{ daily_study_labels|safe }},
+                            datasets: [{
+                                label: '学习时长 (分钟)',
+                                data: {{ daily_study_data|safe }},
+                                borderColor: '#81C784',
+                                backgroundColor: 'rgba(129, 199, 132, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        };
+                        
+                        // 3. 获取当前主题
+                        const isDarkMode = document.documentElement.classList.contains('dark');
+                        
+                        // 4. 图表主题配置
+                        const chartTheme = {
+                            dark: {
+                                textColor: '#FFFFFF',
+                                gridColor: 'rgba(255, 255, 255, 0.1)',
+                                backgroundColor: '#2D3748'
+                            },
+                            light: {
+                                textColor: '#7F8C8D',
+                                gridColor: 'rgba(0, 0, 0, 0.05)',
+                                backgroundColor: '#FFFFFF'
+                            }
+                        };
+                        
+                        const currentTheme = chartTheme[isDarkMode ? 'dark' : 'light'];
+                        
+                        // 5. 初始化每日学习时间图表
+                        const dailyChartCtx = document.getElementById('daily-study-time-chart').getContext('2d');
+                        window.dailyChart = new Chart(dailyChartCtx, {
+                            type: 'line',
+                            data: dailyStudyTimeData,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: {
+                                            color: currentTheme.gridColor
+                                        },
+                                        ticks: {
+                                            color: currentTheme.textColor,
+                                            font: {
+                                                size: 10
+                                            }
+                                        }
+                                    },
+                                    x: {
+                                        grid: {
+                                            display: false
+                                        },
+                                        ticks: {
+                                            color: currentTheme.textColor,
+                                            font: {
+                                                size: 10
+                                            }
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                        titleColor: 'white',
+                                        bodyColor: 'white',
+                                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                                        borderWidth: 1
+                                    }
+                                },
+                                backgroundColor: currentTheme.backgroundColor
+                            }
+                        });
+                        
+                        // 6. 初始化模块进度图表
+                        const moduleChartCtx = document.getElementById('module-progress-chart').getContext('2d');
+                        
+                        // 创建第一个模板的模块进度数据
+                        const firstTemplateId = Object.keys(allTemplatesData)[0];
+                        const firstTemplateModules = allTemplatesData[firstTemplateId] || [];
+                        const moduleProgressData = {
+                            labels: firstTemplateModules.map(module => module.name),
+                            datasets: [{
+                                label: '完成率 (%)',
+                                data: firstTemplateModules.map(module => module.percent),
+                                backgroundColor: firstTemplateModules.map(module => module.color),
+                                borderWidth: 0
+                            }]
+                        };
+                        
+                        window.moduleChart = new Chart(moduleChartCtx, {
+                            type: 'bar',
+                            data: moduleProgressData,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        max: 100,
+                                        grid: {
+                                            color: currentTheme.gridColor
+                                        },
+                                        ticks: {
+                                            color: currentTheme.textColor,
+                                            font: {
+                                                size: 10
+                                            }
+                                        }
+                                    },
+                                    x: {
+                                        grid: {
+                                            display: false
+                                        },
+                                        ticks: {
+                                            color: currentTheme.textColor,
+                                            font: {
+                                                size: 10
+                                            },
+                                            maxRotation: 45,
+                                            minRotation: 45
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                        titleColor: 'white',
+                                        bodyColor: 'white',
+                                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                                        borderWidth: 1
+                                    }
+                                },
+                                backgroundColor: currentTheme.backgroundColor
+                            }
+                        });
+                        
+                        // 7. 准备所有模板的轮播数据
+                        const templateIds = Object.keys(allTemplatesData);
+                        let currentTemplateIndex = 0;
+                        
+                        // 8. 更新模块进度图表函数
+                        function updateModuleChart(templateIndex) {
+                            const templateId = templateIds[templateIndex];
+                            const templateModules = allTemplatesData[templateId] || [];
+                            
+                            // 找到对应的模板对象
+                            const template = templates.find(t => t.id == templateId);
+                            const templateName = template ? template.name : '未知模板';
+                            
+                            // 更新图表数据
+                            window.moduleChart.data.labels = templateModules.map(module => module.name);
+                            window.moduleChart.data.datasets[0].data = templateModules.map(module => module.percent);
+                            window.moduleChart.data.datasets[0].backgroundColor = templateModules.map(module => module.color);
+                            window.moduleChart.update();
+                            
+                            // 更新图表标题
+                            const moduleChartSlide = document.querySelector('.carousel-slide:nth-child(2) h5');
+                            if (moduleChartSlide) {
+                                moduleChartSlide.textContent = `📈 ${templateName} 模块进度`;
+                            }
+                        }
+                        
+                        // 9. 轮播功能
+                        let currentSlide = 0;
+                        const slides = document.querySelectorAll('.carousel-slide');
+                        let carouselInterval;
+                        
+                        function showSlide(index) {
+                            slides.forEach((slide, i) => {
+                                if (i === index) {
+                                    slide.style.left = '0';
+                                    slide.classList.add('active');
+                                } else {
+                                    slide.style.left = '100%';
+                                    slide.classList.remove('active');
+                                }
+                            });
+                            currentSlide = index;
+                        }
+                        
+                        function nextCarouselSlide() {
+                            const nextIndex = (currentSlide + 1) % slides.length;
+                            showSlide(nextIndex);
+                            
+                            // 如果切换到模块进度幻灯片，更新为当前模板的数据
+                            if (nextIndex === 1) {
+                                updateModuleChart(currentTemplateIndex);
+                                // 更新模板索引，准备下一次轮播
+                                currentTemplateIndex = (currentTemplateIndex + 1) % templateIds.length;
+                            }
+                        }
+                        
+                        // 10. 自动轮播 - 每5秒切换一次
+                        carouselInterval = setInterval(nextCarouselSlide, 5000);
+                    });
+                </script>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        // 全局变量：当前选中的模板ID
+        let currentSelectedTemplateId = '';
+        
+        // 存储所有模板的模块数据
+        const allTemplateModules = {};
+        {% for template in templates %}
+            allTemplateModules['{{ template.id }}'] = [
+                {% for key, modules in templates_with_modules.items %}
+                    {% if key == template.id %}
+                        {% for module in modules %}
+                            {"name": "{{ module.name }}", "percent": {{ module.percent }}, "color": "{{ module.color }}"}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            ];
+        {% endfor %}
+        
+        // 确保页面加载完成后，轮播图表和模板滑动功能都能正常工作
+        window.addEventListener('load', function() {
+            console.log('页面加载完成，初始化所有功能...');
+            
+            // 确保轮播图表容器可见
+            const carouselElement = document.getElementById('progress-carousel');
+            if (carouselElement) {
+                carouselElement.style.display = 'block';
+            }
+            
+            // 确保模板滑动功能正常
+            const templatesContainer = document.getElementById('templates-container');
+            if (templatesContainer) {
+                templatesContainer.style.overflowX = 'auto';
+                templatesContainer.style.minHeight = '120px';
+            }
+        });
+        
+        // 模板滑动功能
+        // 滑动模板
+        function slideTemplates(direction) {
+            const container = document.getElementById('templates-container');
+            const itemWidth = 192; // 180px width + 12px gap
+            
+            // 计算滑动距离 - 每次滑动4个模板（整个可见区域）
+            const scrollAmount = direction * itemWidth * 4;
+            
+            // 执行滚动动画
+            container.scrollBy({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+        
+        // 玩偶点击互动效果
+        const dollBox = document.querySelector('.doll-box');
+        const dollMessage = dollBox.querySelector('.doll-box > div:last-child');
+        
+        // 随机鼓励话语列表
+        const encouragementMessages = [
+            '加油！今天也要努力学习哦 💪',
+            '学习使人进步，继续保持！📚',
+            '你是最棒的，我为你感到骄傲！🌟',
+            '坚持就是胜利，相信自己！✨',
+            '每天进步一点点，未来会更好！🌈',
+            '学习虽然辛苦，但成果很甜！🍬',
+            '不要放弃，成功就在前方！🚀',
+            '你已经很努力了，继续加油！💖',
+            '相信自己，你能做到！💪',
+            '学习路上，我会一直陪着你！😊'
+        ];
+        
+        // 点击玩偶触发互动
+        dollBox.addEventListener('click', function() {
+            // 随机选择一条鼓励话语
+            const randomMessage = encouragementMessages[Math.floor(Math.random() * encouragementMessages.length)];
+            
+            // 动画效果：消息框缩放并淡入
+            dollMessage.style.animation = 'none';
+            setTimeout(() => {
+                dollMessage.textContent = randomMessage;
+                dollMessage.style.animation = 'messagePop 0.5s ease-out';
+            }, 10);
+        });
+        
+        // 添加消息弹出动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes messagePop {
+                0% { transform: scale(0.8); opacity: 0; }
+                50% { transform: scale(1.1); opacity: 1; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // 模板选择功能
+        function selectTemplate(templateElement) {
+            // 移除所有模板盒子的选中状态
+            document.querySelectorAll('.template-box').forEach(box => {
+                box.style.background = '#F5F7FA';
+                box.style.color = 'var(--text-primary)';
+                const pElement = box.querySelector('p');
+                if (pElement) {
+                    pElement.style.color = '#7F8C8D';
+                }
+            });
+            
+            // 为当前点击的模板盒子添加选中状态
+            templateElement.style.background = '#E8F5E9';
+            templateElement.style.color = '#2E7D32';
+            const pElement = templateElement.querySelector('p');
+            if (pElement) {
+                pElement.style.color = '#43A047';
+            }
+            
+            // 获取当前选中模板的ID和名称
+            const templateId = templateElement.dataset.templateId;
+            const templateName = templateElement.querySelector('h4').textContent;
+            
+            // 更新全局选中模板ID变量
+            currentSelectedTemplateId = templateId;
+            console.log('Selected template ID updated:', currentSelectedTemplateId);
+            
+            // 更新学习工具链接的模板ID
+            updateStudyToolLinks(templateId);
+            
+            // 调试：打印模板ID和allTemplateModules对象
+            console.log('Template ID:', templateId);
+            console.log('All Template Modules:', allTemplateModules);
+            
+            // 获取当前模板的模块数据
+            const modules = allTemplateModules[templateId] || [];
+            console.log('Modules for template:', modules);
+            
+            // 更新右侧卡片的模板名称
+            const cardElement = document.querySelector('aside > div:last-child');
+            if (!cardElement) {
+                console.error('Card element not found');
+                return;
+            }
+            
+            const planNameElement = cardElement.querySelector('h4');
+            if (planNameElement) {
+                planNameElement.textContent = templateName;
+            }
+            
+            // 清空当前的模块进度条
+            const modulesContainer = cardElement.querySelector('.modules-container');
+            if (modulesContainer) {
+                modulesContainer.innerHTML = '';
+            }
+            
+            // 动态生成新的模块进度条
+            console.log('Generating', modules.length, 'modules');
+            modules.forEach((module, index) => {
+                console.log('Generating module', index + 1, ':', module);
+                // 创建模块进度条元素
+                const moduleDiv = document.createElement('div');
+                moduleDiv.style.marginBottom = '15px';
+                
+                moduleDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                        <span>${module.name}</span>
+                        <span>${module.percent}%</span>
+                    </div>
+                    <div class="pg-track">
+                        <div class="pg-bar" style="width: ${module.percent}%; background: ${module.color};"></div>
+                    </div>
+                `;
+                
+                // 将新生成的模块进度条添加到卡片中
+                if (modulesContainer) {
+                    modulesContainer.appendChild(moduleDiv);
+                }
+            });
+            
+            // 更新轮播图表中的模块进度图表
+            if (window.moduleChart) {
+                // 更新图表数据
+                window.moduleChart.data.labels = modules.map(module => module.name);
+                window.moduleChart.data.datasets[0].data = modules.map(module => module.percent);
+                window.moduleChart.data.datasets[0].backgroundColor = modules.map(module => module.color);
+                
+                // 更新图表标题
+                const moduleChartSlide = document.querySelector('.carousel-slide:nth-child(2) h5');
+                if (moduleChartSlide) {
+                    moduleChartSlide.textContent = `📈 ${templateName} 模块进度`;
+                }
+                
+                // 更新图表
+                window.moduleChart.update();
+            }
+        }
+        
+        // 拖拽功能实现
+        let draggedElement = null;
+        
+        // 拖拽开始
+        function dragStart(event) {
+            draggedElement = event.target;
+            event.target.style.opacity = '0.5';
+            event.target.style.cursor = 'grabbing';
+        }
+        
+        // 拖拽经过
+        function dragOver(event) {
+            event.preventDefault();
+            const target = event.target;
+            // 确保只在模板卡片上允许放置
+            if (target.draggable && target !== draggedElement) {
+                target.style.boxShadow = '0 8px 24px rgba(129, 199, 132, 0.2)';
+                target.style.transform = 'scale(1.05)';
+            }
+        }
+        
+        // 拖拽结束（移出元素）
+        document.addEventListener('dragleave', function(event) {
+            const target = event.target;
+            if (target.draggable && target !== draggedElement) {
+                target.style.boxShadow = '';
+                target.style.transform = '';
+            }
+        });
+        
+        // 放置元素
+        function drop(event) {
+            event.preventDefault();
+            const target = event.target;
+            
+            // 恢复样式
+            draggedElement.style.opacity = '';
+            draggedElement.style.cursor = 'grab';
+            target.style.boxShadow = '';
+            target.style.transform = '';
+            
+            // 确保只在模板卡片上进行放置
+            if (target.draggable && target !== draggedElement) {
+                const container = document.getElementById('templates-container');
+                const allItems = Array.from(container.children);
+                const draggedIndex = allItems.indexOf(draggedElement);
+                const targetIndex = allItems.indexOf(target);
+                
+                // 根据位置插入元素
+                if (draggedIndex < targetIndex) {
+                    container.insertBefore(draggedElement, target.nextSibling);
+                } else {
+                    container.insertBefore(draggedElement, target);
+                }
+                
+                // 更新模板顺序
+                updateTemplateOrder();
+            }
+        }
+        
+        // 更新模板顺序到服务器
+        function updateTemplateOrder() {
+            const container = document.getElementById('templates-container');
+            const items = container.querySelectorAll('[draggable="true"]');
+            const orderData = [];
+            
+            // 收集新的顺序
+            items.forEach((item, index) => {
+                const templateId = item.getAttribute('data-template-id');
+                orderData.push({
+                    id: templateId,
+                    order: index
+                });
+            });
+            
+            // 发送AJAX请求更新顺序
+            fetch('/update_template_order/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('模板顺序更新成功');
+                }
+            })
+            .catch(error => {
+                console.error('更新模板顺序失败:', error);
+            });
+        }
+        
+        // 获取CSRF令牌
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // 更新学习工具链接的模板ID
+        function updateStudyToolLinks(templateId) {
+            // 学习工具链接ID列表
+        const linkIds = [
+            'home-study-session',
+            'home-progress-dashboard',
+            'home-ai-qa',
+            'home-daily-progress',
+            'home-template-management',
+            'home-right-template-management'
+        ];
+            
+            // 更新每个链接
+            linkIds.forEach(linkId => {
+                const link = document.getElementById(linkId);
+                if (link) {
+                    // 获取当前链接的URL
+                    const currentUrl = new URL(link.href, window.location.origin);
+                    
+                    // 设置模板ID参数
+                    currentUrl.searchParams.set('template_id', templateId);
+                    
+                    // 更新链接的href属性
+                    link.href = currentUrl.toString();
+                    console.log(`Updated link ${linkId}:`, link.href);
+                }
+            });
+        }
+        
+        // 初始化
+        window.addEventListener('DOMContentLoaded', function() {
+            // 确保按钮始终可见 - 只在元素存在时操作
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            if (prevBtn) {
+                prevBtn.style.display = 'flex';
+            }
+            if (nextBtn) {
+                nextBtn.style.display = 'flex';
+            }
+            
+            // 获取当前选中的模板ID
+            const selectedTemplate = document.querySelector('.template-box.selected');
+            if (selectedTemplate) {
+                currentSelectedTemplateId = selectedTemplate.dataset.templateId;
+                console.log('Initial selected template ID:', currentSelectedTemplateId);
+                // 更新学习工具链接的模板ID
+                updateStudyToolLinks(currentSelectedTemplateId);
+            }
+            
+            // 暗夜模式初始化
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const root = document.documentElement;
+            
+            if (darkModeToggle) {
+                // 检查本地存储或系统偏好
+                const isDarkMode = localStorage.getItem('darkMode') === 'true' || 
+                                 (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && 
+                                  localStorage.getItem('darkMode') === null);
+                
+                // 设置初始模式
+                if (isDarkMode) {
+                    root.classList.add('dark');
+                }
+                
+                // 切换按钮点击事件
+                darkModeToggle.addEventListener('click', function() {
+                    root.classList.toggle('dark');
+                    
+                    // 保存设置到本地存储
+                    const isDark = root.classList.contains('dark');
+                    localStorage.setItem('darkMode', isDark);
+                    
+                    // 更新图标
+                    updateDarkModeIcon();
+                    
+                    // 更新热力图图例
+                    const legendCells = document.querySelectorAll('#heatmap-legend div[style*="width: 10px"]');
+                    if (legendCells.length > 0) {
+                        legendCells[0].style.background = isDark ? '#2d333b' : '#ebedf0';
+                    }
+                });
+                
+                // 更新图标函数
+                function updateDarkModeIcon() {
+                    const icon = darkModeToggle.querySelector('i');
+                    if (icon) {
+                        if (root.classList.contains('dark')) {
+                            icon.dataset.lucide = 'moon';
+                        } else {
+                            icon.dataset.lucide = 'sun';
+                        }
+                        // 重新渲染图标
+                        lucide.createIcons();
+                    }
+                }
+                
+                // 初始更新图标
+                updateDarkModeIcon();
+            }
+            
+            // ===== 学习热力图 + 打卡强化 =====
+            loadHeatmap();
+        });
+        
+        function loadHeatmap() {
+            fetch('/api/study-heatmap/')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) return;
+                    
+                    // 渲染热力图
+                    renderHeatmap(data.heatmap);
+                })
+                .catch(err => {
+                    document.getElementById('heatmap-grid').innerHTML = 
+                        '<div style="color: var(--text-secondary); font-size: 0.8rem;">加载失败</div>';
+                });
+        }
+        
+        function renderHeatmap(heatmapData) {
+            const grid = document.getElementById('heatmap-grid');
+            if (!grid) return;
+            
+            const weekLabels = ['一', '三', '五', '日'];
+            const colors = ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
+            const today = new Date();
+            
+            // 按周组织数据 (12列 = 12周)
+            const weeks = [];
+            let currentWeek = [];
+            
+            heatmapData.forEach((day, index) => {
+                const d = new Date(day.date + 'T00:00:00');
+                const dayOfWeek = d.getDay(); // 0=Sunday, 1=Monday, ...
+                const adjustedDow = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 0=Monday, 6=Sunday
+                
+                currentWeek.push({ ...day, dow: adjustedDow });
+                
+                if (adjustedDow === 6 || index === heatmapData.length - 1) {
+                    weeks.push(currentWeek);
+                    currentWeek = [];
+                }
+            });
+            
+            let html = '';
+            
+            // 周标签列
+            html += '<div style="display: flex; flex-direction: column; gap: 3px; margin-right: 6px; justify-content: flex-end;">';
+            const labelPositions = [0, 2, 4, 6]; // Mon, Wed, Fri, Sun
+            for (let i = 0; i < 7; i++) {
+                if (labelPositions.includes(i)) {
+                    const idx = labelPositions.indexOf(i);
+                    html += `<div style="width:10px;height:10px;display:flex;align-items:center;font-size:0.6rem;color:var(--text-secondary);">${weekLabels[idx]}</div>`;
+                } else {
+                    html += '<div style="width:10px;height:10px;"></div>';
+                }
+            }
+            html += '</div>';
+            
+            // 周列
+            weeks.forEach((week, wi) => {
+                html += '<div style="display: flex; flex-direction: column; gap: 3px;">';
+                // 星期一到星期日 (0=Mon, 6=Sun)
+                const weekMap = {};
+                week.forEach(day => { weekMap[day.dow] = day; });
+                
+                for (let dow = 0; dow < 7; dow++) {
+                    const day = weekMap[dow];
+                    if (day) {
+                        const tooltip = `${day.date}: ${day.minutes}分钟`;
+                        html += `<div class="heatmap-cell heatmap-level-${day.level}" 
+                                     title="${tooltip}" 
+                                     data-date="${day.date}" 
+                                     data-minutes="${day.minutes}"></div>`;
+                    } else {
+                        html += '<div style="width:10px;height:10px;"></div>';
+                    }
+                }
+                html += '</div>';
+            });
+            
+            grid.innerHTML = html;
+            
+            // 更新图例颜色（暗黑模式适配）
+            const legendCells = document.querySelectorAll('#heatmap-legend div[style*="width: 10px"]');
+            const isDark = document.documentElement.classList.contains('dark');
+            if (isDark && legendCells.length > 0) {
+                legendCells[0].style.background = '#2d333b';
+            }
+        }
+        </script>
+</body>
+</html>

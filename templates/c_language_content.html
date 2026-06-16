@@ -1,0 +1,120 @@
+{% if current_module.name == '语法' %}
+    <!-- 语法功能区 -->
+    <div style="margin-bottom: 20px;">
+        <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">C语言语法学习功能</h4>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
+            <button id="random-check-btn" class="btn btn-primary">
+                <i data-lucide="shuffle" size="16"></i>
+                随机抽查
+            </button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="text" id="syntax-search" placeholder="搜索语法点..." 
+                       style="padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; flex: 1; min-width: 200px;">
+                <button id="search-btn" class="btn btn-secondary">
+                    <i data-lucide="search" size="16"></i>
+                    搜索
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 随机抽查区域 -->
+    <div id="random-check-area" style="margin-bottom: 20px; padding: 20px; background: #F7FAFC; border-radius: 12px; display: none;">
+        <h5 style="margin: 0 0 15px 0; color: var(--text-primary);">随机抽查</h5>
+        <div id="random-syntax" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; color: var(--text-primary);">--</div>
+        <div id="random-syntax-meaning" style="margin-bottom: 15px; color: var(--text-secondary);">点击"随机抽查"开始</div>
+        <div style="display: flex; gap: 12px;">
+            <button id="show-meaning-btn" class="btn btn-secondary">显示释义</button>
+            <button id="next-syntax-btn" class="btn btn-primary">下一个</button>
+            <button id="known-btn" class="btn btn-secondary">已掌握</button>
+        </div>
+    </div>
+
+    <!-- C语言语法示例 -->
+    <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">C语言基础语法</h4>
+    <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+        <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+            <li><strong>变量声明</strong> - int a = 10;</li>
+            <li><strong>条件语句</strong> - if (a > 5) { printf("a大于5"); }</li>
+            <li><strong>循环语句</strong> - for (int i = 0; i < 10; i++) { }</li>
+            <li><strong>函数定义</strong> - int add(int a, int b) { return a + b; }</li>
+            <li><strong>数组</strong> - int arr[5] = {1, 2, 3, 4, 5};</li>
+            <li><strong>指针</strong> - int *p = &a;</li>
+            <li><strong>结构体</strong> - struct Student { char name[20]; int age; };</li>
+            <li><strong>动态内存</strong> - int *p = (int*)malloc(sizeof(int));</li>
+            <li><strong>文件操作</strong> - FILE *fp = fopen("file.txt", "r");</li>
+            <li><strong>字符串处理</strong> - char str[20] = "Hello";</li>
+            <li><strong>预处理器</strong> - #include <stdio.h></li>
+            <li><strong>宏定义</strong> - #define PI 3.14159</li>
+            <li><strong>位运算</strong> - int result = a & b;</li>
+            <li><strong>枚举</strong> - enum Color { RED, GREEN, BLUE };</li>
+            <li><strong>联合</strong> - union Data { int i; float f; char str[20]; };</li>
+            <li><strong>类型转换</strong> - float f = (float)a;</li>
+            <li><strong>静态变量</strong> - static int count = 0;</li>
+            <li><strong>递归函数</strong> - int factorial(int n) { if(n == 0) return 1; return n * factorial(n-1); }</li>
+            <li><strong>命令行参数</strong> - int main(int argc, char *argv[]) { }</li>
+            <li><strong>错误处理</strong> - perror("Error");</li>
+        </ul>
+    </div>
+    <p style="margin: 15px 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+        以上为C语言基础语法示例，建议每天学习5-10个语法点，结合实例代码理解。
+    </p>
+{% elif current_module.name == '编程题' %}
+    <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">编程题练习</h4>
+    <p style="margin: 0 0 15px; color: var(--text-primary);">
+        编程题是专升本C语言考试中的重要部分，主要考察考生的编程能力和问题解决能力。
+    </p>
+    <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">推荐练习题目：</h5>
+    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+        <li>编写一个程序，计算1到100的和</li>
+        <li>编写一个程序，判断一个数是否为素数</li>
+        <li>编写一个程序，实现冒泡排序算法</li>
+        <li>编写一个程序，求两个数的最大公约数和最小公倍数</li>
+        <li>编写一个程序，实现字符串反转</li>
+        <li>编写一个程序，计算阶乘</li>
+        <li>编写一个程序，实现斐波那契数列</li>
+        <li>编写一个程序，判断一个字符串是否为回文</li>
+    </ul>
+    <p style="margin: 15px 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+        建议每天至少完成2道编程题，注重解题思路和代码规范。
+    </p>
+{% elif current_module.name == '知识点' %}
+    <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">C语言知识点</h4>
+    <p style="margin: 0 0 15px; color: var(--text-primary);">
+        C语言知识点是专升本考试的基础，主要包括数据类型、运算符、控制结构、函数、数组、指针等内容。
+    </p>
+    <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">核心知识点：</h5>
+    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+        <li>数据类型：基本数据类型、构造数据类型、指针类型</li>
+        <li>运算符：算术运算符、关系运算符、逻辑运算符、赋值运算符</li>
+        <li>控制结构：顺序结构、选择结构、循环结构</li>
+        <li>函数：函数定义、函数调用、参数传递、递归函数</li>
+        <li>数组：一维数组、二维数组、字符数组、数组指针</li>
+        <li>指针：指针定义、指针运算、指针与数组、指针与函数</li>
+        <li>结构体：结构体定义、结构体变量、结构体指针、结构体数组</li>
+        <li>文件操作：文件打开、文件读写、文件关闭</li>
+    </ul>
+    <p style="margin: 15px 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+        建议每天复习2-3个知识点，结合实例加深理解。
+    </p>
+{% elif current_module.name == '模拟题' %}
+    <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">模拟题练习</h4>
+    <p style="margin: 0 0 15px; color: var(--text-primary);">
+        模拟题是检验学习效果的重要手段，通过做模拟题可以熟悉考试题型和难度。
+    </p>
+    <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">模拟题类型：</h5>
+    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+        <li>单选题：考察基础知识和概念</li>
+        <li>填空题：考察关键知识点和语法细节</li>
+        <li>程序阅读题：考察代码理解能力</li>
+        <li>程序填空题：考察代码补全能力</li>
+        <li>编程题：考察编程能力和问题解决能力</li>
+    </ul>
+    <p style="margin: 15px 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+        建议每周至少完成1套模拟题，严格按照考试时间进行。
+    </p>
+{% else %}
+    <p style="color: var(--text-secondary);">
+        该模块的推荐学习内容正在整理中，敬请期待...
+    </p>
+{% endif %}
