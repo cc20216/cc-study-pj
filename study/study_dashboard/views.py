@@ -1469,7 +1469,7 @@ def generate_ai_template(request):
             framework = generator.generate_subject_framework(subject_name, exam_type)
             
             if not framework:
-                return JsonResponse({'success': False, 'message': 'AI生成失败，请检查网络连接'})
+                return JsonResponse({'success': False, 'message': 'AI生成失败，请检查API配置'})
             
             # 创建学习模板，关联到当前登录用户
             study_template = StudyTemplate.objects.create(
@@ -1615,11 +1615,18 @@ def send_message(request):
 请基于上述对话历史，以自然、友好的语言回答用户的最新问题。"""
             
             # 调用AI生成回复
-            ai_response = generator._call_modelscope_api(
-                prompt=prompt,
-                max_tokens=2000,
-                temperature=0.7
-            )
+            try:
+                ai_response = generator._call_modelscope_api(
+                    prompt=prompt,
+                    max_tokens=2000,
+                    temperature=0.7
+                )
+            except Exception as api_error:
+                error_msg = str(api_error)
+                if '401' in error_msg or 'Authentication' in error_msg:
+                    ai_response = "抱歉，AI服务认证失败，请检查API密钥配置。"
+                else:
+                    ai_response = f"抱歉，AI服务暂时不可用：{error_msg}"
             
             if not ai_response:
                 ai_response = "抱歉，我暂时无法回答这个问题，请稍后再试。"
@@ -1647,7 +1654,7 @@ def send_message(request):
                 }
             })
         except Exception as e:
-            return JsonResponse({'success': False, 'message': str(e)})
+            return JsonResponse({'success': False, 'message': f'对话失败：{str(e)}'})
     
     return JsonResponse({'success': False, 'message': '无效请求'})
 
@@ -1755,7 +1762,7 @@ def generate_ai_template_step2(request):
             framework = generator.generate_subject_framework(subject_name, exam_type)
             
             if not framework:
-                return JsonResponse({'success': False, 'step': 2, 'message': 'AI生成框架失败，请检查网络连接'})
+                return JsonResponse({'success': False, 'step': 2, 'message': 'AI生成框架失败，请检查API配置'})
             
             # 返回生成的框架
             return JsonResponse({
@@ -1765,7 +1772,13 @@ def generate_ai_template_step2(request):
                 'framework': framework
             })
         except Exception as e:
-            return JsonResponse({'success': False, 'step': 2, 'message': f'生成失败：{str(e)}'})
+            error_msg = str(e)
+            # 如果是认证错误，给出更明确的提示
+            if '401' in error_msg or 'Authentication' in error_msg:
+                error_msg = 'API认证失败，请检查ModelScope API Key是否有效'
+            elif 'timeout' in error_msg.lower():
+                error_msg = 'API请求超时，请稍后重试'
+            return JsonResponse({'success': False, 'step': 2, 'message': f'AI生成失败：{error_msg}'})
     
     return JsonResponse({'success': False, 'step': 2, 'message': '无效的请求方式'})
 
@@ -1868,13 +1881,19 @@ def generate_learning_materials(request):
                 exam_type = template.description.split('AI生成的')[1].split(subject_name)[0].strip() if 'AI生成的' in template.description else '通用考试'
                 
                 # 生成学习资料
-                content = generator.generate_learning_material(
-                    subject_name=subject_name,
-                    section_name=module.name,
-                    chapter_names=[module.name],  # 使用模块名称作为章节名称
-                    content_types=final_content_types,
-                    exam_type=exam_type
-                )
+                try:
+                    content = generator.generate_learning_material(
+                        subject_name=subject_name,
+                        section_name=module.name,
+                        chapter_names=[module.name],  # 使用模块名称作为章节名称
+                        content_types=final_content_types,
+                        exam_type=exam_type
+                    )
+                except Exception as api_error:
+                    error_msg = str(api_error)
+                    if '401' in error_msg or 'Authentication' in error_msg:
+                        error_msg = 'API认证失败，请检查ModelScope API Key是否有效'
+                    return JsonResponse({'success': False, 'message': f'学习资料生成失败：{error_msg}'})
                 
                 if content:
                     # 保存学习资料到数据库

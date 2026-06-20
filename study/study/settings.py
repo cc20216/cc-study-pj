@@ -3,7 +3,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # 加载 .env 环境变量
-load_dotenv()
+# override=True 确保读取最新的 .env 文件，覆盖进程中已有的环境变量
+load_dotenv(override=True)
 
 # 项目根目录
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # 适配当前结构

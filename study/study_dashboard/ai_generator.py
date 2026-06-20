@@ -5,7 +5,8 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 # 加载环境变量
-load_dotenv()
+# override=True 确保读取最新的 .env 文件，覆盖进程中已有的环境变量
+load_dotenv(override=True)
 
 
 class MultiSubjectAIGenerator:
@@ -63,15 +64,14 @@ class MultiSubjectAIGenerator:
 
             # 检查响应状态
             if response.status_code != 200:
-                print(f"API请求失败，状态码：{response.status_code}")
-                print(f"响应内容：{response.text[:500]}")
-                return None
+                error_msg = f"API请求失败，状态码：{response.status_code}"
+                if response.text:
+                    error_msg += f"，错误信息：{response.text[:200]}"
+                print(error_msg)
+                raise Exception(error_msg)
 
             # 解析响应
             result = response.json()
-
-            # 调试：打印完整响应结构（开发时使用）
-            # print(f"API响应结构：{json.dumps(result, ensure_ascii=False, indent=2)[:500]}...")
 
             # 提取生成内容
             if "choices" in result and len(result["choices"]) > 0:
@@ -81,26 +81,31 @@ class MultiSubjectAIGenerator:
                     print(f"API调用成功，生成内容长度：{len(content)}字符")
                     return content
                 else:
-                    print(f"响应格式异常，缺少message/content字段")
-                    print(f"响应内容：{result}")
-                    return None
+                    error_msg = "响应格式异常，缺少message/content字段"
+                    print(f"{error_msg}，响应内容：{result}")
+                    raise Exception(error_msg)
             else:
-                print(f"API响应异常，无choices字段：{result}")
-                return None
+                error_msg = "API响应异常，无choices字段"
+                print(f"{error_msg}：{result}")
+                raise Exception(error_msg)
 
         except requests.exceptions.Timeout:
-            print("错误：API请求超时（180秒）")
-            return None
+            error_msg = "API请求超时（180秒）"
+            print(f"错误：{error_msg}")
+            raise Exception(error_msg)
         except requests.exceptions.ConnectionError:
-            print("错误：API连接失败，请检查网络")
-            return None
+            error_msg = "API连接失败，请检查网络"
+            print(f"错误：{error_msg}")
+            raise Exception(error_msg)
         except json.JSONDecodeError as e:
-            print(f"JSON解析失败：{str(e)}")
+            error_msg = f"JSON解析失败：{str(e)}"
+            print(f"错误：{error_msg}")
             print(f"原始响应：{response.text[:500] if 'response' in locals() else '无响应'}")
-            return None
+            raise Exception(error_msg)
         except Exception as e:
-            print(f"API调用异常：{type(e).__name__}: {str(e)}")
-            return None
+            error_msg = f"API调用异常：{type(e).__name__}: {str(e)}"
+            print(f"错误：{error_msg}")
+            raise Exception(error_msg)
 
     def generate_subject_framework(self, subject_name, exam_type):
         """

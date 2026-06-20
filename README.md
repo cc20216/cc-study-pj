@@ -14,12 +14,7 @@
 
 ## 项目截图
 
-<!-- TODO: 替换为实际截图 -->
-<!--
-![首页](screenshots/home.png)
-![学习看板](screenshots/dashboard.png)
-![AI对话](screenshots/ai-chat.png)
--->
+
 
 ---
 
