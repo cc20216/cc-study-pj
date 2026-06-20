@@ -20,10 +20,16 @@
   <img src="assets/screenshots/dashboard.png" alt="学习看板" width="80%" />
 </p>
 
-### AI 智能生成学习计划
+### AI 智能生成学习模板
 
 <p align="center">
-  <img src="assets/screenshots/ai_generate_plan.png" alt="AI生成学习计划" width="80%" />
+  <img src="assets/screenshots/ai_generate_plan.png" alt="AI生成学习模板" width="80%" />
+</p>
+
+### AI 生成学习内容
+
+<p align="center">
+  <img src="assets/screenshots/ai_generate_content.png" alt="AI生成学习内容" width="80%" />
 </p>
 
 ### AI 学习助手
@@ -32,10 +38,10 @@
   <img src="assets/screenshots/ai_chat.png" alt="AI学习助手" width="80%" />
 </p>
 
-### 学习模板管理
+### 进度看板
 
 <p align="center">
-  <img src="assets/screenshots/template_management.png" alt="学习模板管理" width="80%" />
+  <img src="assets/screenshots/progress_board.png" alt="进度看板" width="80%" />
 </p>
 
 ### 学习热力图
