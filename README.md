@@ -1,6 +1,8 @@
-# 智能学习管理系统
+# StudyHub - 智能学习管理系统
 
-> 基于 Django + ModelScope AI 的智能学习管理平台，让 AI 帮你制定学习计划、生成学习资料。
+<p align="center">
+  <strong>告别盲目刷题，让 AI 成为你的专属学习教练</strong>
+</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.7+-blue" alt="Python">
@@ -9,6 +11,22 @@
   <img src="https://img.shields.io/badge/AI-ModelScope-purple" alt="ModelScope">
   <img src="https://img.shields.io/badge/License-MIT-yellow" alt="License">
 </p>
+
+---
+
+## 项目简介
+
+StudyHub 是一个基于 Django 框架与 ModelScope 大模型的智能学习管理平台。不同于传统的 Todo List 或笔记工具，它通过 **AI 驱动**的方式，为每位学习者量身定制学习路径——从知识框架的搭建，到章节内容的生成，再到学习进度的可视化追踪，覆盖了"学什么 → 怎么学 → 学得怎么样"的完整闭环。
+
+### 亮点
+
+- **AI 生成学习模板**：输入学科和考试类型（四级、考研、专升本等），AI 自动拆解知识框架，生成结构化的学习模板
+- **AI 生成学习内容**：基于模板，一键生成各模块的详细学习资料，无需手动整理
+- **AI 学习助手**：接入 Qwen 大模型，支持实时对话答疑，随时解答学习中的疑问
+- **学习热力图**：仿 GitHub 贡献图风格，用颜色深浅直观展示每日学习时长，激励持续学习
+- **进度看板**：Chart.js 数据可视化，模块完成率、学习时长、连续天数一目了然
+- **专注计时器**：内置番茄钟，记录每次学习时长，自动统计累计时间
+- **暗黑模式**：支持亮色/暗色主题切换，保护夜间学习视力
 
 ---
 
@@ -143,8 +161,8 @@ graph TB
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/你的用户名/仓库名.git
-cd dbstudy
+git clone https://github.com/cc20216/cc-study-pj.git
+cd cc-study-pj
 
 # 2. 创建虚拟环境
 python -m venv .venv
