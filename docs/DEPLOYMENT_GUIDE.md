@@ -99,11 +99,57 @@ DB_PASSWORD=你的MySQL密码
 DB_HOST=127.0.0.1
 DB_PORT=3306
 
-# API 配置
+# API 配置（AI 功能必需）
 MODELSCOPE_API_KEY=你的ModelScope API密钥
+MODELSCOPE_API_URL=https://api-inference.modelscope.cn/v1/chat/completions
+MODELSCOPE_MODEL=Qwen/Qwen3-VL-8B-Instruct
 ```
 
 > **注意**：`.env` 文件已在 `.gitignore` 中排除，不会被提交到 Git，确保密码安全。
+
+### 4.1.1 AI 模型配置说明
+
+项目默认使用 **Qwen/Qwen3-VL-8B-Instruct** 模型，但也支持其他兼容 OpenAI Chat Completions 格式的模型。
+
+#### ModelScope 支持的模型（部分）
+
+| 模型名称 | 模型 ID | 说明 |
+|---------|---------|------|
+| Qwen3-VL-8B-Instruct | `Qwen/Qwen3-VL-8B-Instruct` | 多模态模型，支持图文理解（默认） |
+| Qwen3-7B-Instruct | `Qwen/Qwen3-7B-Instruct` | 纯文本模型，响应更快 |
+| Qwen2-7B-Instruct | `Qwen/Qwen2-7B-Instruct` | Qwen2 系列文本模型 |
+| Qwen-7B-Chat | `Qwen/Qwen-7B-Chat` | Qwen 原始系列 |
+
+#### 使用其他模型的方法
+
+如需更换模型，只需修改 `.env` 文件中的 `MODELSCOPE_MODEL`：
+
+```ini
+# 使用纯文本模型（响应更快）
+MODELSCOPE_MODEL=Qwen/Qwen3-7B-Instruct
+
+# 使用 Qwen2 系列
+MODELSCOPE_MODEL=Qwen/Qwen2-7B-Instruct
+```
+
+#### 使用其他 API 服务
+
+项目采用 **OpenAI 兼容接口**，理论上支持任何兼容 OpenAI Chat Completions 格式的 API：
+
+| 平台 | API URL | 说明 |
+|------|---------|------|
+| ModelScope | `https://api-inference.modelscope.cn/v1/chat/completions` | 默认 |
+| OpenAI | `https://api.openai.com/v1/chat/completions` | 需要 OpenAI API Key |
+| DeepSeek | `https://api.deepseek.com/v1/chat/completions` | 需要 DeepSeek API Key |
+
+如需切换到其他平台，修改 `.env`：
+
+```ini
+# 示例：使用 OpenAI API
+MODELSCOPE_API_URL=https://api.openai.com/v1/chat/completions
+MODELSCOPE_API_KEY=sk-your-openai-api-key
+MODELSCOPE_MODEL=gpt-4o-mini
+```
 
 ### 4.2 创建数据库
 

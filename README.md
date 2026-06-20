@@ -14,6 +14,35 @@
 
 ## 项目截图
 
+### 学习看板（首页）
+
+<p align="center">
+  <img src="assets/screenshots/dashboard.png" alt="学习看板" width="80%" />
+</p>
+
+### AI 智能生成学习计划
+
+<p align="center">
+  <img src="assets/screenshots/ai_generate_plan.png" alt="AI生成学习计划" width="80%" />
+</p>
+
+### AI 学习助手
+
+<p align="center">
+  <img src="assets/screenshots/ai_chat.png" alt="AI学习助手" width="80%" />
+</p>
+
+### 学习模板管理
+
+<p align="center">
+  <img src="assets/screenshots/template_management.png" alt="学习模板管理" width="80%" />
+</p>
+
+### 学习热力图
+
+<p align="center">
+  <img src="assets/screenshots/heatmap.png" alt="学习热力图" width="80%" />
+</p>
 
 
 ---
